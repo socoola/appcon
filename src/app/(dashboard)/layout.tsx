@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Megaphone, Gauge, Smartphone, Layers } from 'lucide-react';
+import { Megaphone, Gauge, Smartphone, Layers, ScrollText } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 const navItems = [
   { href: '/', label: '仪表盘', icon: Gauge },
   { href: '/apps', label: '应用管理', icon: Smartphone },
   { href: '/levels', label: '等级管理', icon: Layers },
+  { href: '/logs', label: '请求日志', icon: ScrollText },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

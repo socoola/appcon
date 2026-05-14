@@ -45,6 +45,31 @@ export const adSlots = pgTable(
 	]
 );
 
+// 广告配置请求日志表 - 保存24小时
+export const adConfigLogs = pgTable(
+	"ad_config_logs",
+	{
+		id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+		request_id: varchar("request_id", { length: 64 }).notNull(),       // 请求ID
+		app_id: varchar("app_id", { length: 255 }).notNull(),              // 请求的包名
+		channel: varchar("channel", { length: 64 }),                        // 渠道
+		nonce: varchar("nonce", { length: 64 }),                            // nonce
+		response_code: integer("response_code").notNull(),                  // 响应code
+		response_msg: varchar("response_msg", { length: 255 }),             // 响应msg
+		level: integer("level"),                                            // 返回的level
+		slot_count: integer("slot_count").notNull().default(0),            // 返回的广告位数
+		ip: varchar("ip", { length: 64 }),                                  // 请求IP
+		user_agent: varchar("user_agent", { length: 512 }),                 // User-Agent
+		latency_ms: integer("latency_ms"),                                  // 响应耗时(ms)
+		created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		index("ad_config_logs_created_at_idx").on(table.created_at),
+		index("ad_config_logs_app_id_idx").on(table.app_id),
+		index("ad_config_logs_response_code_idx").on(table.response_code),
+	]
+);
+
 // 广告等级配置表 - 每个Level包含哪些广告位
 export const adLevels = pgTable(
 	"ad_levels",
