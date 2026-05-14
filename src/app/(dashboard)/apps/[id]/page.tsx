@@ -34,16 +34,23 @@ interface AdSlot {
   enabled: boolean;
 }
 
-const platformMap: Record<number, string> = {
-  0: 'iOS',
-  1: 'Android',
-  2: '全平台',
-};
+interface AdLevel {
+  id: string;
+  level: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  open_screen: boolean;
+  banner: boolean;
+  incentive_video: boolean;
+  insert_full_screen: boolean;
+}
 
 export default function AppConfigPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [app, setApp] = useState<AppInfo | null>(null);
   const [slots, setSlots] = useState<AdSlot[]>([]);
+  const [levels, setLevels] = useState<AdLevel[]>([]);
   const [level, setLevel] = useState(4);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -52,13 +59,17 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     Promise.all([
       fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
       fetch(`/api/apps/${id}/slots`, { credentials: 'include' }).then((r) => r.json()),
-    ]).then(([appRes, slotsRes]) => {
+      fetch(`/api/levels`, { credentials: 'include' }).then((r) => r.json()),
+    ]).then(([appRes, slotsRes, levelsRes]) => {
       if (appRes.data) {
         setApp(appRes.data);
         setLevel(appRes.data.level);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
+      }
+      if (levelsRes.data) {
+        setLevels(levelsRes.data);
       }
     });
   }, [id]);
@@ -113,23 +124,39 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       });
   };
 
-  // 生成API预览JSON
+  // 获取当前 level 配置，用于预览过滤
+  const currentLevelConfig = levels.find((l) => l.level === level);
+
+  // 生成API预览JSON - 与实际 API 返回格式一致
+  const levelSlotMap: Record<string, boolean> = {
+    openScreenId: currentLevelConfig?.open_screen ?? true,
+    bannerId: currentLevelConfig?.banner ?? true,
+    IncentiveVideoId: currentLevelConfig?.incentive_video ?? true,
+    newInsertFullScreenId: currentLevelConfig?.insert_full_screen ?? true,
+  };
+
+  const previewList = slots
+    .filter((s) => s.enabled && levelSlotMap[s.slot_name] !== false)
+    .map((s) => ({
+      name: s.slot_name,
+      app_id: app?.media_id || '',
+      val: s.ad_slot_id || '',
+    }));
+
   const apiPreview = {
     request_id: 'preview-xxx',
     code: 10000,
-    data: {
-      list: slots
-        .filter((s) => s.enabled)
-        .map((s) => ({
-          name: s.slot_name,
-          app_id: app?.media_id || '',
-          val: s.ad_slot_id || '',
-          platform: s.platform,
-        })),
-      level,
-    },
+    data: { list: previewList, level },
     msg: 'APP广告配置获取成功',
   };
+
+  // 生成完整的预览 URL
+  const previewDomain = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? window.location.origin
+    : 'https://appad.coze.site';
+  const previewTimestamp = Date.now();
+  const previewNonce = 'PREVIEW_NONCE_PLACEHOLDER';
+  const previewUrl = `${previewDomain}/api/san/ad-config?app_id=${app?.package_name || ''}&channel=apple&timestamp=${previewTimestamp}&nonce=${previewNonce}`;
 
   if (!app) {
     return <div className="text-muted-foreground">加载中...</div>;
@@ -171,13 +198,24 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[0, 1, 2, 3, 4].map((l) => (
-                  <SelectItem key={l} value={String(l)}>
-                    Level {l}
-                  </SelectItem>
-                ))}
+                {levels.length > 0 ? (
+                  levels.map((l) => (
+                    <SelectItem key={l.level} value={String(l.level)}>
+                      Level {l.level} - {l.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  [0, 1, 2, 3, 4].map((l) => (
+                    <SelectItem key={l} value={String(l)}>
+                      Level {l}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
+            {currentLevelConfig && (
+              <p className="text-xs text-muted-foreground mt-1.5">{currentLevelConfig.description}</p>
+            )}
           </div>
         </div>
       </Card>
@@ -195,53 +233,67 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             <div className="col-span-2 text-right">启用</div>
           </div>
           {/* 广告位行 */}
-          {slots.map((slot) => (
-            <div
-              key={slot.id}
-              className="grid grid-cols-12 gap-4 px-4 py-3.5 items-center border-b border-outline-variant/10 hover:bg-muted/30 transition-colors"
-            >
-              <div className="col-span-3">
-                <span className="text-sm font-medium text-foreground">{slot.slot_label}</span>
-                <span className="text-xs text-muted-foreground ml-2 font-mono">{slot.slot_name}</span>
+          {slots.map((slot) => {
+            // 判断当前 level 下该广告位是否被禁用
+            const levelDisabled = levelSlotMap[slot.slot_name] === false;
+            return (
+              <div
+                key={slot.id}
+                className={`grid grid-cols-12 gap-4 px-4 py-3.5 items-center border-b border-outline-variant/10 transition-colors ${
+                  levelDisabled ? 'bg-muted/50 opacity-60' : 'hover:bg-muted/30'
+                }`}
+              >
+                <div className="col-span-3">
+                  <span className="text-sm font-medium text-foreground">{slot.slot_label}</span>
+                  <span className="text-xs text-muted-foreground ml-2 font-mono">{slot.slot_name}</span>
+                  {levelDisabled && (
+                    <Badge className="ml-2 bg-warning/10 text-warning border-none hover:bg-warning/10 text-xs">当前Level下关闭</Badge>
+                  )}
+                </div>
+                <div className="col-span-3">
+                  <Input
+                    className="bg-muted border-none font-mono text-sm"
+                    placeholder="输入广告位ID"
+                    value={slot.ad_slot_id || ''}
+                    onChange={(e) => handleSlotChange(slot.id, 'ad_slot_id', e.target.value)}
+                    disabled={levelDisabled}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Select
+                    value={String(slot.platform)}
+                    onValueChange={(v) => handleSlotChange(slot.id, 'platform', Number(v))}
+                    disabled={levelDisabled}
+                  >
+                    <SelectTrigger className="bg-muted border-none">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">iOS</SelectItem>
+                      <SelectItem value="1">Android</SelectItem>
+                      <SelectItem value="2">全平台</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-2">
+                  {slot.enabled && !levelDisabled ? (
+                    <Badge className="bg-success/10 text-success border-none hover:bg-success/10">已启用</Badge>
+                  ) : levelDisabled ? (
+                    <Badge className="bg-warning/10 text-warning border-none hover:bg-warning/10">Level关闭</Badge>
+                  ) : (
+                    <Badge className="bg-muted text-muted-foreground border-none hover:bg-muted">已禁用</Badge>
+                  )}
+                </div>
+                <div className="col-span-2 flex justify-end">
+                  <Switch
+                    checked={slot.enabled}
+                    onCheckedChange={(v) => handleSlotChange(slot.id, 'enabled', v)}
+                    disabled={levelDisabled}
+                  />
+                </div>
               </div>
-              <div className="col-span-3">
-                <Input
-                  className="bg-muted border-none font-mono text-sm"
-                  placeholder="输入广告位ID"
-                  value={slot.ad_slot_id || ''}
-                  onChange={(e) => handleSlotChange(slot.id, 'ad_slot_id', e.target.value)}
-                />
-              </div>
-              <div className="col-span-2">
-                <Select
-                  value={String(slot.platform)}
-                  onValueChange={(v) => handleSlotChange(slot.id, 'platform', Number(v))}
-                >
-                  <SelectTrigger className="bg-muted border-none">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">iOS</SelectItem>
-                    <SelectItem value="1">Android</SelectItem>
-                    <SelectItem value="2">全平台</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-2">
-                {slot.enabled ? (
-                  <Badge className="bg-success/10 text-success border-none hover:bg-success/10">已启用</Badge>
-                ) : (
-                  <Badge className="bg-muted text-muted-foreground border-none hover:bg-muted">已禁用</Badge>
-                )}
-              </div>
-              <div className="col-span-2 flex justify-end">
-                <Switch
-                  checked={slot.enabled}
-                  onCheckedChange={(v) => handleSlotChange(slot.id, 'enabled', v)}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
 
@@ -265,9 +317,22 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       {/* API预览 */}
       <Card className="p-5 shadow-card border-none">
         <h2 className="text-base font-semibold text-foreground mb-3">API返回预览</h2>
-        <p className="text-xs text-muted-foreground mb-3">
-          接口地址：<code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">/api/san/ad-config?app_id={app.package_name}</code>
+        <p className="text-xs text-muted-foreground mb-2">
+          接口地址：
         </p>
+        <code className="block bg-muted px-3 py-2 rounded text-foreground font-mono text-xs break-all mb-3">
+          {previewUrl}
+        </code>
+        <p className="text-xs text-muted-foreground mb-1">
+          当前 Level {level} ({currentLevelConfig?.name || '未知'}) 下启用的广告位：
+        </p>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {Object.entries(levelSlotMap).map(([name, enabled]) => (
+            <Badge key={name} className={enabled ? 'bg-success/10 text-success border-none' : 'bg-muted text-muted-foreground border-none'}>
+              {name}: {enabled ? '开' : '关'}
+            </Badge>
+          ))}
+        </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
           {JSON.stringify(apiPreview, null, 2)}
         </pre>

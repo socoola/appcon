@@ -25,8 +25,21 @@ interface AppItem {
   enabled_slots: number;
 }
 
+interface AdLevel {
+  id: string;
+  level: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  open_screen: boolean;
+  banner: boolean;
+  incentive_video: boolean;
+  insert_full_screen: boolean;
+}
+
 export default function AppsPage() {
   const [apps, setApps] = useState<AppItem[]>([]);
+  const [levels, setLevels] = useState<AdLevel[]>([]);
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ name: '', package_name: '', media_id: '' });
@@ -39,9 +52,26 @@ export default function AppsPage() {
     setApps(json.data || []);
   }, [search]);
 
+  const fetchLevels = useCallback(async () => {
+    const res = await fetch('/api/levels', { credentials: 'include' });
+    const json = await res.json();
+    setLevels(json.data || []);
+  }, []);
+
   useEffect(() => {
     fetchApps();
-  }, [fetchApps]);
+    fetchLevels();
+  }, [fetchApps, fetchLevels]);
+
+  const getLevelName = (levelNum: number) => {
+    const found = levels.find((l) => l.level === levelNum);
+    return found ? found.name : '';
+  };
+
+  const getLevelDescription = (levelNum: number) => {
+    const found = levels.find((l) => l.level === levelNum);
+    return found?.description || '';
+  };
 
   const handleAdd = async () => {
     if (!addForm.name || !addForm.package_name) return;
@@ -129,7 +159,11 @@ export default function AppsPage() {
                     <span className="text-primary font-medium">{app.enabled_slots}</span>
                     <span className="text-muted-foreground">/{app.total_slots}</span>
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-foreground">Level {app.level}</td>
+                  <td className="px-5 py-3.5 text-sm">
+                    <div className="text-foreground font-medium">Level {app.level}</div>
+                    <div className="text-xs text-muted-foreground">{getLevelName(app.level)}</div>
+                    <div className="text-xs text-muted-foreground/70 mt-0.5">{getLevelDescription(app.level)}</div>
+                  </td>
                   <td className="px-5 py-3.5 text-sm text-muted-foreground font-mono">{app.media_id || '-'}</td>
                   <td className="px-5 py-3.5">
                     {app.enabled_slots === app.total_slots && app.total_slots > 0 ? (
