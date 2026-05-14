@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['bcryptjs'],
+  serverExternalPackages: ['bcryptjs', 'pg', 'pg-native', 'pg-pool', 'drizzle-orm'],
   async rewrites() {
     return [
       {
