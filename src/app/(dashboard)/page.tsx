@@ -30,8 +30,11 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/stats', { credentials: 'include' })
-      .then((res) => res.json())
-      .then((res) => setStats(res.data))
+      .then((res) => {
+        if (res.status === 401) { window.location.href = '/login'; return null; }
+        return res.json();
+      })
+      .then((res) => { if (res) setStats(res.data); })
       .catch(() => {});
   }, []);
 
