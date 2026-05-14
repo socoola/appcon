@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
-import { verifyPassword, createToken, getAuthCookieConfig } from '@/lib/auth';
+import { verifyPassword, createToken, getCookieOptions, TOKEN_NAME } from '@/lib/auth';
 
 // POST /api/auth/login
 export async function POST(request: NextRequest) {
@@ -56,8 +56,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const cookieConfig = getAuthCookieConfig(token);
-    response.cookies.set(cookieConfig);
+    const opts = getCookieOptions();
+    response.cookies.set(opts.name, token, {
+      httpOnly: opts.httpOnly,
+      secure: opts.secure,
+      sameSite: opts.sameSite,
+      path: opts.path,
+      maxAge: opts.maxAge,
+    });
 
     return response;
   } catch (err) {

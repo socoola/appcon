@@ -1,19 +1,8 @@
-import type { NextConfig } from 'next';
-import path from 'path';
+import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: path.resolve(__dirname, '../../'),
-  allowedDevOrigins: ['*.dev.coze.site'],
-  serverExternalPackages: ['pg', 'pg-native', 'bcryptjs', 'drizzle-orm'],
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*',
-        pathname: '/**',
-      },
-    ],
-  },
+  serverExternalPackages: ['bcryptjs'],
   async rewrites() {
     return [
       {
