@@ -1,3 +1,2 @@
-import { relations } from "drizzle-orm/relations";
-import {  } from "./schema";
-
+// Relations file placeholder - not used at runtime
+// API routes use @supabase/supabase-js directly
