@@ -1,0 +1,36 @@
+{
+  "elements": [
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/home.html"
+      },
+      "title": "仪表盘",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/apps.html"
+      },
+      "title": "应用管理",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/app-config.html"
+      },
+      "title": "应用配置",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/levels.html"
+      },
+      "title": "等级管理",
+      "size": "web"
+    }
+  ]
+}

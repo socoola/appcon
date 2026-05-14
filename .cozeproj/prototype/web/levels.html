@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://lf-code-agent.coze.cn/obj/x-ai-cn/fonts/google/inter.css" rel="stylesheet"/>
+
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/lucide/lucide-1.11.0.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/tailwindcss/tailwindcss-browser-4.2.4.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      /* === 品牌色 === */
+      --color-primary:              #2F6BFF;
+      --color-primary-container:    #E8F0FF;
+      --color-on-primary:           #ffffff;
+      /* === 背景 / 表面 === */
+      --color-background:                 #F6F8FB;
+      --color-surface-container-lowest:   #FFFFFF;
+      --color-surface:                    #FFFFFF;
+      --color-surface-container:          #EDF1F7;
+      --color-surface-container-high:     #E2E8F0;
+      --color-surface-container-highest:  #D8DFE9;
+      /* === 文字 === */
+      --color-on-surface:           #152033;
+      --color-on-surface-variant:   #637089;
+      /* === 功能色 === */
+      --color-success:  #16A37B;
+      --color-error:    #EF4444;
+      --color-warning:  #F59E0B;
+      /* === 边框 === */
+      --color-outline:          #D0D5E0;
+      --color-outline-variant:  #E6EAF2;
+      /* === 圆角 === */
+      --radius-sm:   0.375rem;
+      --radius-md:   0.5rem;
+      --radius-lg:   0.75rem;
+      --radius-xl:   1rem;
+      --radius-2xl:  1.5rem;
+      --radius-full: 9999px;
+      /* === 阴影 === */
+      --shadow-card:   0 2px 8px rgba(0,0,0,0.08);
+      --shadow-float:  0 10px 25px rgba(0,0,0,0.12);
+      --shadow-dialog: 0 25px 50px rgba(0,0,0,0.16);
+      /* === 字体 === */
+      --font-sans: "Inter", system-ui, sans-serif;
+    }
+  </style>
+
+  <!-- 图片兜底 -->
+  <script>
+    document.addEventListener('error', function (e) {
+      const img = e.target;
+      if (img.tagName !== 'IMG' || img.dataset.fallback) return;
+      img.dataset.fallback = '1';
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const cat = img.getAttribute('data-category') || '其他';
+      const alt = img.getAttribute('alt') || '';
+      const label = esc(alt.length > 8 ? alt.slice(0, 8) + '…' : alt);
+      const icons = { '人物': '👤', '自然风景': '🏞', '动物': '🐾', '建筑城市': '🏙', '运动体育': '⚽', '交通工具': '🚗', '食物': '🍽', '服饰时尚': '👗', '商业科技': '💼', '游戏娱乐': '🎮', '艺术': '🎨', '其他': '🖼' };
+      const icon = icons[cat] || '🖼';
+      const w = img.width || 400, h = img.height || 300;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="45%" text-anchor="middle" font-size="${Math.min(w, h) * 0.18}" dominant-baseline="central">${icon}</text><text x="50%" y="68%" text-anchor="middle" font-size="${Math.min(w, h) * 0.07}" fill="%239ca3af" font-family="system-ui,sans-serif" dominant-baseline="central">${label}</text></svg>`;
+      img.src = 'data:image/svg+xml,' + svg;
+    }, true);
+  </script>
+
+  <!-- Toggle 开关样式 -->
+  <style>
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 11px;
+      background: var(--color-surface-container-high);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+    }
+    .toggle-switch.active {
+      background: var(--color-primary);
+    }
+    .toggle-switch.disabled {
+      background: var(--color-surface-container-high);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease;
+    }
+    .toggle-switch.active::after {
+      transform: translateX(18px);
+    }
+    /* 隐藏原生 radio */
+    .default-radio {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--color-outline);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .default-radio:checked {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      box-shadow: inset 0 0 0 3px #fff;
+    }
+    /* 可编辑字段 hover 效果 */
+    .editable-field {
+      cursor: text;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+    .editable-field:hover {
+      background: var(--color-surface-container);
+    }
+    .editable-field:focus {
+      outline: none;
+      background: var(--color-surface-container);
+      box-shadow: 0 0 0 2px var(--color-primary)/30;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface font-sans">
+
+  <!-- @nav:start -->
+  <header class="bg-surface sticky top-0 z-40 h-14 flex items-center justify-between px-6 border-b border-outline-variant/20">
+    <div class="flex items-center gap-2.5">
+      <i data-lucide="megaphone" class="text-primary w-5 h-5"></i>
+      <span class="font-bold text-base text-on-surface">AdConfig</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-on-surface-variant">小初</span>
+      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-medium">初</div>
+    </div>
+  </header>
+
+  <div class="flex" style="height: calc(100vh - 3.5rem)">
+    <aside class="w-56 shrink-0 bg-surface border-r border-outline-variant/20 overflow-y-auto">
+      <div class="p-3 space-y-0.5">
+        <a href="home.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="gauge" class="w-4 h-4"></i>仪表盘
+        </a>
+        <a href="apps.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="smartphone" class="w-4 h-4"></i>应用管理
+        </a>
+        <a href="levels.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-medium text-sm"
+           aria-current="page">
+          <i data-lucide="layers" class="w-4 h-4"></i>等级管理
+        </a>
+      </div>
+    </aside>
+    <!-- @nav:end -->
+
+    <!-- @main-content:start -->
+    <main class="flex-1 min-w-0 overflow-y-auto bg-background p-6">
+
+      <!-- 页面标题区 -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-on-surface">等级管理</h1>
+        <p class="text-sm text-on-surface-variant mt-1.5">配置不同广告等级对应的广告位展示策略</p>
+      </div>
+
+      <!-- 顶部说明卡片 -->
+      <div class="bg-primary-container/60 rounded-lg p-4 mb-8 flex items-start gap-3">
+        <i data-lucide="info" class="w-5 h-5 text-primary mt-0.5 shrink-0"></i>
+        <div>
+          <p class="text-sm text-on-surface font-medium">等级越高，展示的广告位越多</p>
+          <p class="text-xs text-on-surface-variant mt-1">客户端通过 API 返回的 level 字段控制广告展示策略，每个等级定义了允许展示的广告位类型组合。</p>
+        </div>
+      </div>
+
+      <!-- 等级配置列表 -->
+      <div id="level-list" class="space-y-4">
+
+        <!-- 列表-Level 0 -->
+        <div class="bg-surface rounded-lg shadow-card p-5" data-level="0">
+          <div class="flex items-start justify-between gap-4">
+            <!-- 左侧：等级信息 -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant text-sm font-bold">0</span>
+                <div class="flex-1 min-w-0">
+                  <input id="level-name-0" type="text" value="无广告" class="editable-field text-base font-semibold text-on-surface bg-transparent border-none px-1 py-0.5 w-full" />
+                </div>
+              </div>
+              <input id="level-desc-0" type="text" value="付费用户/VIP" class="editable-field text-sm text-on-surface-variant bg-transparent border-none px-1 py-0.5 w-full mb-4" placeholder="输入等级说明..." />
+
+              <!-- 广告位开关 -->
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- openScreenId -->
+                <div class="flex items-center gap-2.5 opacity-40">
+                  <div id="toggle-level0-openScreenId" class="toggle-switch disabled" data-level="0" data-slot="openScreenId"></div>
+                  <span class="text-sm text-on-surface-variant">开屏广告</span>
+                </div>
+                <!-- bannerId -->
+                <div class="flex items-center gap-2.5 opacity-40">
+                  <div id="toggle-level0-bannerId" class="toggle-switch disabled" data-level="0" data-slot="bannerId"></div>
+                  <span class="text-sm text-on-surface-variant">Banner 广告</span>
+                </div>
+                <!-- incentiveVideoId -->
+                <div class="flex items-center gap-2.5 opacity-40">
+                  <div id="toggle-level0-incentiveVideoId" class="toggle-switch disabled" data-level="0" data-slot="incentiveVideoId"></div>
+                  <span class="text-sm text-on-surface-variant">激励视频</span>
+                </div>
+                <!-- newInsertFullScreenId -->
+                <div class="flex items-center gap-2.5 opacity-40">
+                  <div id="toggle-level0-newInsertFullScreenId" class="toggle-switch disabled" data-level="0" data-slot="newInsertFullScreenId"></div>
+                  <span class="text-sm text-on-surface-variant">新插屏全屏</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右侧：默认等级单选 -->
+            <div class="flex items-center gap-2 pt-1 shrink-0">
+              <input type="radio" name="default-level" id="radio-level-0" class="default-radio" value="0" />
+              <label for="radio-level-0" class="text-xs text-on-surface-variant cursor-pointer whitespace-nowrap">默认等级</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 列表-Level 1 -->
+        <div class="bg-surface rounded-lg shadow-card p-5" data-level="1">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary text-sm font-bold">1</span>
+                <div class="flex-1 min-w-0">
+                  <input id="level-name-1" type="text" value="仅开屏" class="editable-field text-base font-semibold text-on-surface bg-transparent border-none px-1 py-0.5 w-full" />
+                </div>
+              </div>
+              <input id="level-desc-1" type="text" value="低频用户基础广告" class="editable-field text-sm text-on-surface-variant bg-transparent border-none px-1 py-0.5 w-full mb-4" placeholder="输入等级说明..." />
+
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- openScreenId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level1-openScreenId" class="toggle-switch active" data-level="1" data-slot="openScreenId"></div>
+                  <span class="text-sm text-on-surface">开屏广告</span>
+                </div>
+                <!-- bannerId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level1-bannerId" class="toggle-switch" data-level="1" data-slot="bannerId"></div>
+                  <span class="text-sm text-on-surface-variant">Banner 广告</span>
+                </div>
+                <!-- incentiveVideoId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level1-incentiveVideoId" class="toggle-switch" data-level="1" data-slot="incentiveVideoId"></div>
+                  <span class="text-sm text-on-surface-variant">激励视频</span>
+                </div>
+                <!-- newInsertFullScreenId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level1-newInsertFullScreenId" class="toggle-switch" data-level="1" data-slot="newInsertFullScreenId"></div>
+                  <span class="text-sm text-on-surface-variant">新插屏全屏</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1 shrink-0">
+              <input type="radio" name="default-level" id="radio-level-1" class="default-radio" value="1" />
+              <label for="radio-level-1" class="text-xs text-on-surface-variant cursor-pointer whitespace-nowrap">默认等级</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 列表-Level 2 -->
+        <div class="bg-surface rounded-lg shadow-card p-5" data-level="2">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary text-sm font-bold">2</span>
+                <div class="flex-1 min-w-0">
+                  <input id="level-name-2" type="text" value="开屏+Banner" class="editable-field text-base font-semibold text-on-surface bg-transparent border-none px-1 py-0.5 w-full" />
+                </div>
+              </div>
+              <input id="level-desc-2" type="text" value="中等频率用户" class="editable-field text-sm text-on-surface-variant bg-transparent border-none px-1 py-0.5 w-full mb-4" placeholder="输入等级说明..." />
+
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- openScreenId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level2-openScreenId" class="toggle-switch active" data-level="2" data-slot="openScreenId"></div>
+                  <span class="text-sm text-on-surface">开屏广告</span>
+                </div>
+                <!-- bannerId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level2-bannerId" class="toggle-switch active" data-level="2" data-slot="bannerId"></div>
+                  <span class="text-sm text-on-surface">Banner 广告</span>
+                </div>
+                <!-- incentiveVideoId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level2-incentiveVideoId" class="toggle-switch" data-level="2" data-slot="incentiveVideoId"></div>
+                  <span class="text-sm text-on-surface-variant">激励视频</span>
+                </div>
+                <!-- newInsertFullScreenId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level2-newInsertFullScreenId" class="toggle-switch" data-level="2" data-slot="newInsertFullScreenId"></div>
+                  <span class="text-sm text-on-surface-variant">新插屏全屏</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1 shrink-0">
+              <input type="radio" name="default-level" id="radio-level-2" class="default-radio" value="2" />
+              <label for="radio-level-2" class="text-xs text-on-surface-variant cursor-pointer whitespace-nowrap">默认等级</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 列表-Level 3 -->
+        <div class="bg-surface rounded-lg shadow-card p-5" data-level="3">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary text-sm font-bold">3</span>
+                <div class="flex-1 min-w-0">
+                  <input id="level-name-3" type="text" value="开屏+Banner+激励视频" class="editable-field text-base font-semibold text-on-surface bg-transparent border-none px-1 py-0.5 w-full" />
+                </div>
+              </div>
+              <input id="level-desc-3" type="text" value="高频用户标准广告" class="editable-field text-sm text-on-surface-variant bg-transparent border-none px-1 py-0.5 w-full mb-4" placeholder="输入等级说明..." />
+
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- openScreenId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level3-openScreenId" class="toggle-switch active" data-level="3" data-slot="openScreenId"></div>
+                  <span class="text-sm text-on-surface">开屏广告</span>
+                </div>
+                <!-- bannerId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level3-bannerId" class="toggle-switch active" data-level="3" data-slot="bannerId"></div>
+                  <span class="text-sm text-on-surface">Banner 广告</span>
+                </div>
+                <!-- incentiveVideoId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level3-incentiveVideoId" class="toggle-switch active" data-level="3" data-slot="incentiveVideoId"></div>
+                  <span class="text-sm text-on-surface">激励视频</span>
+                </div>
+                <!-- newInsertFullScreenId - 关闭 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level3-newInsertFullScreenId" class="toggle-switch" data-level="3" data-slot="newInsertFullScreenId"></div>
+                  <span class="text-sm text-on-surface-variant">新插屏全屏</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1 shrink-0">
+              <input type="radio" name="default-level" id="radio-level-3" class="default-radio" value="3" />
+              <label for="radio-level-3" class="text-xs text-on-surface-variant cursor-pointer whitespace-nowrap">默认等级</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 列表-Level 4 -->
+        <div class="bg-surface rounded-lg shadow-card p-5 ring-1 ring-primary/20" data-level="4">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary text-sm font-bold">4</span>
+                <div class="flex-1 min-w-0">
+                  <input id="level-name-4" type="text" value="全量广告" class="editable-field text-base font-semibold text-on-surface bg-transparent border-none px-1 py-0.5 w-full" />
+                </div>
+                <!-- 默认等级标记 -->
+                <span id="default-badge-4" class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-primary/15 text-primary shrink-0">
+                  <i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>默认
+                </span>
+              </div>
+              <input id="level-desc-4" type="text" value="新注册用户默认等级" class="editable-field text-sm text-on-surface-variant bg-transparent border-none px-1 py-0.5 w-full mb-4" placeholder="输入等级说明..." />
+
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- openScreenId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level4-openScreenId" class="toggle-switch active" data-level="4" data-slot="openScreenId"></div>
+                  <span class="text-sm text-on-surface">开屏广告</span>
+                </div>
+                <!-- bannerId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level4-bannerId" class="toggle-switch active" data-level="4" data-slot="bannerId"></div>
+                  <span class="text-sm text-on-surface">Banner 广告</span>
+                </div>
+                <!-- incentiveVideoId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level4-incentiveVideoId" class="toggle-switch active" data-level="4" data-slot="incentiveVideoId"></div>
+                  <span class="text-sm text-on-surface">激励视频</span>
+                </div>
+                <!-- newInsertFullScreenId - 开启 -->
+                <div class="flex items-center gap-2.5">
+                  <div id="toggle-level4-newInsertFullScreenId" class="toggle-switch active" data-level="4" data-slot="newInsertFullScreenId"></div>
+                  <span class="text-sm text-on-surface">新插屏全屏</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1 shrink-0">
+              <input type="radio" name="default-level" id="radio-level-4" class="default-radio" value="4" checked />
+              <label for="radio-level-4" class="text-xs text-on-surface-variant cursor-pointer whitespace-nowrap">默认等级</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底部保存按钮 -->
+      <div class="mt-8 flex items-center gap-3 pb-4">
+        <button id="btn-save" class="bg-primary text-on-primary px-6 py-2.5 rounded-md text-sm font-medium
+                                     hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i>保存配置
+        </button>
+        <button id="btn-reset" class="bg-surface-container text-on-surface border-none px-6 py-2.5 rounded-md text-sm font-medium
+                                      hover:bg-surface-container-high active:scale-[0.98] transition-all">
+          重置
+        </button>
+        <!-- 保存成功提示（默认隐藏） -->
+        <span id="save-success-tip" class="text-sm text-success font-medium hidden inline-flex items-center gap-1">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i>保存成功
+        </span>
+      </div>
+
+    </main>
+    <!-- @main-content:end -->
+  </div>
+
+  <script>
+    $(function () {
+
+      // === Toggle 开关点击事件 ===
+      // Level 0 的开关禁用，不可切换；其他等级的开关可自由切换
+      $('#level-list').on('click', '.toggle-switch:not(.disabled)', function () {
+        var $toggle = $(this);
+        $toggle.toggleClass('active');
+        // 更新对应标签文字颜色
+        var $label = $toggle.siblings('span');
+        if ($toggle.hasClass('active')) {
+          $label.removeClass('text-on-surface-variant').addClass('text-on-surface');
+        } else {
+          $label.removeClass('text-on-surface').addClass('text-on-surface-variant');
+        }
+      });
+
+      // === 默认等级单选切换 ===
+      // 点击单选按钮时，更新默认等级标记（badge）的位置
+      $('input[name="default-level"]').on('change', function () {
+        // 移除所有默认标记 badge
+        $('[id^="default-badge-"]').remove();
+        // 移除所有卡片的默认等级高亮边框
+        $('#level-list .bg-surface').removeClass('ring-1 ring-primary/20');
+
+        var selectedLevel = $(this).val();
+        var $card = $('[data-level="' + selectedLevel + '"]');
+        // 给选中等级的卡片添加高亮边框
+        $card.addClass('ring-1 ring-primary/20');
+        // 在等级编号行添加默认标记 badge
+        $card.find('.flex.items-center.gap-3').eq(0).append(
+          '<span id="default-badge-' + selectedLevel + '" class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-primary/15 text-primary shrink-0">' +
+          '<i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>默认</span>'
+        );
+        // 重新渲染 Lucide 图标
+        lucide.createIcons();
+      });
+
+      // === 保存按钮 ===
+      // 点击保存时，收集所有等级配置数据并打印到控制台
+      // 后续实现：
+      // 1. 遍历每个 Level 卡片，读取等级名称、说明、各开关状态、默认等级
+      // 2. 组装为 JSON 数据调用后端 API 保存
+      // 3. 保存成功后显示成功提示，3秒后自动隐藏
+      // 4. 保存失败时显示错误提示
+      $('#btn-save').on('click', function () {
+        var config = [];
+        for (var i = 0; i <= 4; i++) {
+          var $card = $('[data-level="' + i + '"]');
+          config.push({
+            level: i,
+            name: $('#level-name-' + i).val(),
+            description: $('#level-desc-' + i).val(),
+            slots: {
+              openScreenId: $('#toggle-level' + i + '-openScreenId').hasClass('active'),
+              bannerId: $('#toggle-level' + i + '-bannerId').hasClass('active'),
+              incentiveVideoId: $('#toggle-level' + i + '-incentiveVideoId').hasClass('active'),
+              newInsertFullScreenId: $('#toggle-level' + i + '-newInsertFullScreenId').hasClass('active')
+            },
+            isDefault: $('input[name="default-level"]:checked').val() === String(i)
+          });
+        }
+        console.log('保存等级配置:', JSON.stringify(config, null, 2));
+
+        // 显示成功提示
+        $('#save-success-tip').removeClass('hidden');
+        setTimeout(function () {
+          $('#save-success-tip').addClass('hidden');
+        }, 3000);
+      });
+
+      // === 重置按钮 ===
+      // 点击重置时，将所有配置恢复为页面初始状态
+      // 后续实现：
+      // 1. 重新从后端获取最新配置数据并刷新页面
+      // 2. 或直接调用 location.reload() 刷新页面
+      $('#btn-reset').on('click', function () {
+        console.log('重置等级配置，应恢复为初始状态');
+        // 原型简化：直接刷新页面
+        location.reload();
+      });
+
+    });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>

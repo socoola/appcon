@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://lf-code-agent.coze.cn/obj/x-ai-cn/fonts/google/inter.css" rel="stylesheet"/>
+
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/lucide/lucide-1.11.0.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/tailwindcss/tailwindcss-browser-4.2.4.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      /* === 品牌色 === */
+      --color-primary:              #2F6BFF;
+      --color-primary-container:    #E8F0FF;
+      --color-on-primary:           #ffffff;
+      /* === 背景 / 表面 === */
+      --color-background:                 #F6F8FB;
+      --color-surface-container-lowest:   #FFFFFF;
+      --color-surface:                    #FFFFFF;
+      --color-surface-container:          #EDF1F7;
+      --color-surface-container-high:     #E2E8F0;
+      --color-surface-container-highest:  #D8DFE9;
+      /* === 文字 === */
+      --color-on-surface:           #152033;
+      --color-on-surface-variant:   #637089;
+      /* === 功能色 === */
+      --color-success:  #16A37B;
+      --color-error:    #EF4444;
+      --color-warning:  #F59E0B;
+      /* === 边框 === */
+      --color-outline:          #D0D5E0;
+      --color-outline-variant:  #E6EAF2;
+      /* === 圆角 === */
+      --radius-sm:   0.375rem;
+      --radius-md:   0.5rem;
+      --radius-lg:   0.75rem;
+      --radius-xl:   1rem;
+      --radius-2xl:  1.5rem;
+      --radius-full: 9999px;
+      /* === 阴影 === */
+      --shadow-card:   0 2px 8px rgba(0,0,0,0.08);
+      --shadow-float:  0 10px 25px rgba(0,0,0,0.12);
+      --shadow-dialog: 0 25px 50px rgba(0,0,0,0.16);
+      /* === 字体 === */
+      --font-sans: "Inter", system-ui, sans-serif;
+    }
+  </style>
+
+  <!-- 图片兜底 -->
+  <script>
+    document.addEventListener('error', function (e) {
+      const img = e.target;
+      if (img.tagName !== 'IMG' || img.dataset.fallback) return;
+      img.dataset.fallback = '1';
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const cat = img.getAttribute('data-category') || '其他';
+      const alt = img.getAttribute('alt') || '';
+      const label = esc(alt.length > 8 ? alt.slice(0, 8) + '…' : alt);
+      const icons = { '人物': '👤', '自然风景': '🏞', '动物': '🐾', '建筑城市': '🏙', '运动体育': '⚽', '交通工具': '🚗', '食物': '🍽', '服饰时尚': '👗', '商业科技': '💼', '游戏娱乐': '🎮', '艺术': '🎨', '其他': '🖼' };
+      const icon = icons[cat] || '🖼';
+      const w = img.width || 400, h = img.height || 300;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="45%" text-anchor="middle" font-size="${Math.min(w, h) * 0.18}" dominant-baseline="central">${icon}</text><text x="50%" y="68%" text-anchor="middle" font-size="${Math.min(w, h) * 0.07}" fill="%239ca3af" font-family="system-ui,sans-serif" dominant-baseline="central">${label}</text></svg>`;
+      img.src = 'data:image/svg+xml,' + svg;
+    }, true);
+  </script>
+</head>
+
+<body class="bg-background text-on-surface font-sans">
+
+  <!-- @nav:start 导航组件，不需要的页面则不要复制此段 -->
+  <header class="bg-surface sticky top-0 z-40 h-14 flex items-center justify-between px-6 border-b border-outline-variant/20">
+    <div class="flex items-center gap-2.5">
+      <i data-lucide="megaphone" class="text-primary w-5 h-5"></i>
+      <span class="font-bold text-base text-on-surface">AdConfig</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-on-surface-variant">小初</span>
+      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-medium">初</div>
+    </div>
+  </header>
+
+  <div class="flex" style="height: calc(100vh - 3.5rem)">
+    <aside class="w-56 shrink-0 bg-surface border-r border-outline-variant/20 overflow-y-auto">
+      <div class="p-3 space-y-0.5">
+        <a href="home.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="gauge" class="w-4 h-4"></i>仪表盘
+        </a>
+        <a href="apps.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-medium text-sm"
+           aria-current="page">
+          <i data-lucide="smartphone" class="w-4 h-4"></i>应用管理
+        </a>
+        <a href="levels.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="layers" class="w-4 h-4"></i>等级管理
+        </a>
+      </div>
+    </aside>
+
+    <!-- @nav:end 导航组件，不需要的页面则不要复制此段 -->
+
+    <!-- @main-content:start -->
+    <main class="flex-1 min-w-0 overflow-y-auto bg-background p-6">
+
+      <!-- 面包屑导航 -->
+      <nav id="breadcrumb" class="flex items-center gap-1.5 text-sm mb-6" aria-label="面包屑导航">
+        <a href="apps.html" class="text-on-surface-variant hover:text-primary transition-colors">应用管理</a>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-on-surface-variant/50"></i>
+        <span class="text-on-surface-variant">应用配置</span>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-on-surface-variant/50"></i>
+        <span class="text-on-surface font-medium">短视频（com.san.video）</span>
+      </nav>
+
+      <!-- 页面标题 -->
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+          <i data-lucide="smartphone" class="w-5 h-5 text-primary"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface">应用配置</h1>
+          <p class="text-sm text-on-surface-variant mt-0.5">管理广告位ID、平台及启用状态</p>
+        </div>
+      </div>
+
+      <!-- 基本信息卡片 -->
+      <section id="card-basic-info" class="bg-surface rounded-lg shadow-card p-5 mb-6">
+        <h2 class="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-primary"></i>基本信息
+        </h2>
+        <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+          <!-- 应用名称 -->
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-on-surface-variant w-28 shrink-0">应用名称</label>
+            <span id="info-app-name" class="text-sm font-medium text-on-surface">短视频</span>
+          </div>
+          <!-- 包名 -->
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-on-surface-variant w-28 shrink-0">包名</label>
+            <span id="info-package-name" class="text-sm font-medium text-on-surface">com.san.video</span>
+          </div>
+          <!-- 穿山甲媒体ID -->
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-on-surface-variant w-28 shrink-0">穿山甲媒体ID</label>
+            <span id="info-media-id" class="text-sm font-medium text-on-surface">5000546</span>
+          </div>
+          <!-- 当前Level -->
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-on-surface-variant w-28 shrink-0" for="select-level">当前Level</label>
+            <select id="select-level" class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                       text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-32">
+              <option value="0">Level 0</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4" selected>Level 4</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 广告位配置卡片 -->
+      <section id="card-ad-slots" class="bg-surface rounded-lg shadow-card p-5 mb-6">
+        <h2 class="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-4 h-4 text-primary"></i>广告位配置
+        </h2>
+
+        <!-- 表头 -->
+        <div class="grid grid-cols-[1.2fr_1.5fr_1fr_0.6fr] gap-4 px-4 py-2.5 bg-surface-container rounded-t-md text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
+          <span>广告位</span>
+          <span>广告位ID</span>
+          <span>平台</span>
+          <span class="text-center">启用</span>
+        </div>
+
+        <div class="divide-y divide-outline-variant/30">
+
+          <!-- 列表-开屏广告 -->
+          <div id="row-open-screen" class="grid grid-cols-[1.2fr_1.5fr_1fr_0.6fr] gap-4 items-center px-4 py-4 hover:bg-surface-container/50 transition-colors">
+            <div>
+              <div class="text-sm font-medium text-on-surface">开屏广告</div>
+              <div class="text-xs text-on-surface-variant mt-0.5">openScreenId</div>
+            </div>
+            <input id="input-open-screen" type="text" value="800546808" placeholder="输入广告位ID"
+                   class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                          text-on-surface placeholder:text-on-surface-variant/50
+                          focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full" />
+            <select id="select-platform-open-screen" class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                       text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full">
+              <option value="0">iOS</option>
+              <option value="1">Android</option>
+              <option value="2" selected>全平台</option>
+            </select>
+            <div class="flex justify-center">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="toggle-open-screen" type="checkbox" checked class="sr-only peer" />
+                <div class="w-10 h-5.5 bg-surface-container-high rounded-full peer
+                            peer-checked:bg-primary transition-colors
+                            after:content-[''] after:absolute after:top-[3px] after:left-[3px]
+                            after:bg-white after:rounded-full after:h-4 after:w-4
+                            after:transition-all peer-checked:after:translate-x-[18px]"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 列表-Banner广告 -->
+          <div id="row-banner" class="grid grid-cols-[1.2fr_1.5fr_1fr_0.6fr] gap-4 items-center px-4 py-4 hover:bg-surface-container/50 transition-colors">
+            <div>
+              <div class="text-sm font-medium text-on-surface">Banner广告</div>
+              <div class="text-xs text-on-surface-variant mt-0.5">bannerId</div>
+            </div>
+            <input id="input-banner" type="text" value="900546833" placeholder="输入广告位ID"
+                   class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                          text-on-surface placeholder:text-on-surface-variant/50
+                          focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full" />
+            <select id="select-platform-banner" class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                       text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full">
+              <option value="0" selected>iOS</option>
+              <option value="1">Android</option>
+              <option value="2">全平台</option>
+            </select>
+            <div class="flex justify-center">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="toggle-banner" type="checkbox" checked class="sr-only peer" />
+                <div class="w-10 h-5.5 bg-surface-container-high rounded-full peer
+                            peer-checked:bg-primary transition-colors
+                            after:content-[''] after:absolute after:top-[3px] after:left-[3px]
+                            after:bg-white after:rounded-full after:h-4 after:w-4
+                            after:transition-all peer-checked:after:translate-x-[18px]"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 列表-激励视频 -->
+          <div id="row-incentive-video" class="grid grid-cols-[1.2fr_1.5fr_1fr_0.6fr] gap-4 items-center px-4 py-4 hover:bg-surface-container/50 transition-colors">
+            <div>
+              <div class="text-sm font-medium text-on-surface">激励视频</div>
+              <div class="text-xs text-on-surface-variant mt-0.5">IncentiveVideoId</div>
+            </div>
+            <input id="input-incentive-video" type="text" value="900546826" placeholder="输入广告位ID"
+                   class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                          text-on-surface placeholder:text-on-surface-variant/50
+                          focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full" />
+            <select id="select-platform-incentive-video" class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                       text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full">
+              <option value="0">iOS</option>
+              <option value="1" selected>Android</option>
+              <option value="2">全平台</option>
+            </select>
+            <div class="flex justify-center">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="toggle-incentive-video" type="checkbox" checked class="sr-only peer" />
+                <div class="w-10 h-5.5 bg-surface-container-high rounded-full peer
+                            peer-checked:bg-primary transition-colors
+                            after:content-[''] after:absolute after:top-[3px] after:left-[3px]
+                            after:bg-white after:rounded-full after:h-4 after:w-4
+                            after:transition-all peer-checked:after:translate-x-[18px]"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 列表-插屏全屏 -->
+          <div id="row-insert-fullscreen" class="grid grid-cols-[1.2fr_1.5fr_1fr_0.6fr] gap-4 items-center px-4 py-4 hover:bg-surface-container/50 transition-colors rounded-b-md">
+            <div>
+              <div class="text-sm font-medium text-on-surface">插屏全屏</div>
+              <div class="text-xs text-on-surface-variant mt-0.5">newInsertFullScreenId</div>
+            </div>
+            <input id="input-insert-fullscreen" type="text" value="947877457" placeholder="输入广告位ID"
+                   class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                          text-on-surface placeholder:text-on-surface-variant/50
+                          focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full" />
+            <select id="select-platform-insert-fullscreen" class="bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                       text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors w-full">
+              <option value="0">iOS</option>
+              <option value="1">Android</option>
+              <option value="2" selected>全平台</option>
+            </select>
+            <div class="flex justify-center">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="toggle-insert-fullscreen" type="checkbox" class="sr-only peer" />
+                <div class="w-10 h-5.5 bg-surface-container-high rounded-full peer
+                            peer-checked:bg-primary transition-colors
+                            after:content-[''] after:absolute after:top-[3px] after:left-[3px]
+                            after:bg-white after:rounded-full after:h-4 after:w-4
+                            after:transition-all peer-checked:after:translate-x-[18px]"></div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 底部操作栏 -->
+      <section id="action-bar" class="bg-surface rounded-lg shadow-card p-5 mb-6 flex items-center gap-3">
+        <button id="btn-save" class="bg-primary text-on-primary px-5 py-2.5 rounded-md text-sm font-medium
+                       hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i>保存配置
+        </button>
+        <button id="btn-reset" class="bg-surface-container text-on-surface border-none px-5 py-2.5 rounded-md text-sm font-medium
+                       hover:bg-surface-container-high active:scale-[0.98] transition-all inline-flex items-center gap-2">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>重置
+        </button>
+        <div id="save-status" class="ml-3 text-sm text-success hidden">
+          <i data-lucide="check-circle" class="w-4 h-4 inline-block align-text-bottom"></i>
+          <span>配置已保存</span>
+        </div>
+      </section>
+
+      <!-- API预览区域 -->
+      <section id="card-api-preview" class="bg-surface rounded-lg shadow-card p-5">
+        <h2 class="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
+          <i data-lucide="code-2" class="w-4 h-4 text-primary"></i>API 返回预览
+          <span class="text-xs font-normal text-on-surface-variant ml-1">只读 · 当前配置对应的 JSON 结构</span>
+        </h2>
+        <pre id="api-json-preview" class="bg-surface-container rounded-lg p-4 text-sm text-on-surface-variant overflow-x-auto leading-relaxed font-mono"><code>{
+  "appName": "短视频",
+  "packageName": "com.san.video",
+  "mediaId": "5000546",
+  "level": 4,
+  "adSlots": {
+    "openScreenId": {
+      "slotId": "800546808",
+      "platform": 2,
+      "enabled": true
+    },
+    "bannerId": {
+      "slotId": "900546833",
+      "platform": 0,
+      "enabled": true
+    },
+    "IncentiveVideoId": {
+      "slotId": "900546826",
+      "platform": 1,
+      "enabled": true
+    },
+    "newInsertFullScreenId": {
+      "slotId": "947877457",
+      "platform": 2,
+      "enabled": false
+    }
+  }
+}</code></pre>
+      </section>
+
+    </main>
+    <!-- @main-content:end -->
+  </div>
+
+  <script>
+    $(function () {
+
+      // 保存按钮 - 点击后应实现：
+      // 1. 收集所有表单字段（Level、4个广告位ID、平台选择、启用开关）
+      // 2. 校验广告位ID是否为有效数字
+      // 3. 调用后端 API 保存配置
+      // 4. 成功后更新 API 预览区域的 JSON 内容
+      // 5. 显示保存成功状态提示
+      $('#btn-save').on('click', function () {
+        // 收集当前配置
+        var config = {
+          appName: '短视频',
+          packageName: 'com.san.video',
+          mediaId: '5000546',
+          level: parseInt($('#select-level').val()),
+          adSlots: {
+            openScreenId: {
+              slotId: $('#input-open-screen').val(),
+              platform: parseInt($('#select-platform-open-screen').val()),
+              enabled: $('#toggle-open-screen').is(':checked')
+            },
+            bannerId: {
+              slotId: $('#input-banner').val(),
+              platform: parseInt($('#select-platform-banner').val()),
+              enabled: $('#toggle-banner').is(':checked')
+            },
+            IncentiveVideoId: {
+              slotId: $('#input-incentive-video').val(),
+              platform: parseInt($('#select-platform-incentive-video').val()),
+              enabled: $('#toggle-incentive-video').is(':checked')
+            },
+            newInsertFullScreenId: {
+              slotId: $('#input-insert-fullscreen').val(),
+              platform: parseInt($('#select-platform-insert-fullscreen').val()),
+              enabled: $('#toggle-insert-fullscreen').is(':checked')
+            }
+          }
+        };
+
+        // 更新API预览JSON
+        $('#api-json-preview').find('code').text(JSON.stringify(config, null, 2));
+
+        // 显示保存成功状态
+        $('#save-status').removeClass('hidden');
+        lucide.createIcons();
+
+        // 3秒后自动隐藏提示
+        setTimeout(function () {
+          $('#save-status').addClass('hidden');
+        }, 3000);
+
+        console.log('保存配置:', config);
+      });
+
+      // 重置按钮 - 点击后应实现：
+      // 1. 将所有表单字段恢复为初始默认值
+      // 2. 恢复 API 预览区域为初始 JSON
+      // 3. 隐藏保存成功提示
+      $('#btn-reset').on('click', function () {
+        // 恢复Level
+        $('#select-level').val('4');
+
+        // 恢复广告位ID
+        $('#input-open-screen').val('800546808');
+        $('#input-banner').val('900546833');
+        $('#input-incentive-video').val('900546826');
+        $('#input-insert-fullscreen').val('947877457');
+
+        // 恢复平台选择
+        $('#select-platform-open-screen').val('2');
+        $('#select-platform-banner').val('0');
+        $('#select-platform-incentive-video').val('1');
+        $('#select-platform-insert-fullscreen').val('2');
+
+        // 恢复启用开关
+        $('#toggle-open-screen').prop('checked', true);
+        $('#toggle-banner').prop('checked', true);
+        $('#toggle-incentive-video').prop('checked', true);
+        $('#toggle-insert-fullscreen').prop('checked', false);
+
+        // 恢复API预览
+        var defaultJson = '{\n' +
+          '  "appName": "短视频",\n' +
+          '  "packageName": "com.san.video",\n' +
+          '  "mediaId": "5000546",\n' +
+          '  "level": 4,\n' +
+          '  "adSlots": {\n' +
+          '    "openScreenId": {\n' +
+          '      "slotId": "800546808",\n' +
+          '      "platform": 2,\n' +
+          '      "enabled": true\n' +
+          '    },\n' +
+          '    "bannerId": {\n' +
+          '      "slotId": "900546833",\n' +
+          '      "platform": 0,\n' +
+          '      "enabled": true\n' +
+          '    },\n' +
+          '    "IncentiveVideoId": {\n' +
+          '      "slotId": "900546826",\n' +
+          '      "platform": 1,\n' +
+          '      "enabled": true\n' +
+          '    },\n' +
+          '    "newInsertFullScreenId": {\n' +
+          '      "slotId": "947877457",\n' +
+          '      "platform": 2,\n' +
+          '      "enabled": false\n' +
+          '    }\n' +
+          '  }\n' +
+          '}';
+        $('#api-json-preview').find('code').text(defaultJson);
+
+        // 隐藏保存提示
+        $('#save-status').addClass('hidden');
+
+        console.log('配置已重置');
+      });
+
+    });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>

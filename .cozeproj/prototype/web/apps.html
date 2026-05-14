@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://lf-code-agent.coze.cn/obj/x-ai-cn/fonts/google/inter.css" rel="stylesheet"/>
+
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/lucide/lucide-1.11.0.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/tailwindcss/tailwindcss-browser-4.2.4.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      /* === 品牌色 === */
+      --color-primary:              #2F6BFF;
+      --color-primary-container:    #E8F0FF;
+      --color-on-primary:           #ffffff;
+      /* === 背景 / 表面 === */
+      --color-background:                 #F6F8FB;
+      --color-surface-container-lowest:   #FFFFFF;
+      --color-surface:                    #FFFFFF;
+      --color-surface-container:          #EDF1F7;
+      --color-surface-container-high:     #E2E8F0;
+      --color-surface-container-highest:  #D8DFE9;
+      /* === 文字 === */
+      --color-on-surface:           #152033;
+      --color-on-surface-variant:   #637089;
+      /* === 功能色 === */
+      --color-success:  #16A37B;
+      --color-error:    #EF4444;
+      --color-warning:  #F59E0B;
+      /* === 边框 === */
+      --color-outline:          #D0D5E0;
+      --color-outline-variant:  #E6EAF2;
+      /* === 圆角 === */
+      --radius-sm:   0.375rem;
+      --radius-md:   0.5rem;
+      --radius-lg:   0.75rem;
+      --radius-xl:   1rem;
+      --radius-2xl:  1.5rem;
+      --radius-full: 9999px;
+      /* === 阴影 === */
+      --shadow-card:   0 2px 8px rgba(0,0,0,0.08);
+      --shadow-float:  0 10px 25px rgba(0,0,0,0.12);
+      --shadow-dialog: 0 25px 50px rgba(0,0,0,0.16);
+      /* === 字体 === */
+      --font-sans: "Inter", system-ui, sans-serif;
+    }
+  </style>
+
+  <!-- 图片兜底 -->
+  <script>
+    document.addEventListener('error', function (e) {
+      const img = e.target;
+      if (img.tagName !== 'IMG' || img.dataset.fallback) return;
+      img.dataset.fallback = '1';
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const cat = img.getAttribute('data-category') || '其他';
+      const alt = img.getAttribute('alt') || '';
+      const label = esc(alt.length > 8 ? alt.slice(0, 8) + '…' : alt);
+      const icons = { '人物': '👤', '自然风景': '🏞', '动物': '🐾', '建筑城市': '🏙', '运动体育': '⚽', '交通工具': '🚗', '食物': '🍽', '服饰时尚': '👗', '商业科技': '💼', '游戏娱乐': '🎮', '艺术': '🎨', '其他': '🖼' };
+      const icon = icons[cat] || '🖼';
+      const w = img.width || 400, h = img.height || 300;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="45%" text-anchor="middle" font-size="${Math.min(w, h) * 0.18}" dominant-baseline="central">${icon}</text><text x="50%" y="68%" text-anchor="middle" font-size="${Math.min(w, h) * 0.07}" fill="%239ca3af" font-family="system-ui,sans-serif" dominant-baseline="central">${label}</text></svg>`;
+      img.src = 'data:image/svg+xml,' + svg;
+    }, true);
+  </script>
+</head>
+
+<body class="bg-background text-on-surface font-sans">
+
+  <!-- @nav:start -->
+  <header class="bg-surface sticky top-0 z-40 h-14 flex items-center justify-between px-6 border-b border-outline-variant/20">
+    <div class="flex items-center gap-2.5">
+      <i data-lucide="megaphone" class="text-primary w-5 h-5"></i>
+      <span class="font-bold text-base text-on-surface">AdConfig</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-on-surface-variant">小初</span>
+      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-medium">初</div>
+    </div>
+  </header>
+
+  <div class="flex" style="height: calc(100vh - 3.5rem)">
+    <aside class="w-56 shrink-0 bg-surface border-r border-outline-variant/20 overflow-y-auto">
+      <div class="p-3 space-y-0.5">
+        <a href="home.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="gauge" class="w-4 h-4"></i>仪表盘
+        </a>
+        <a href="apps.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-medium text-sm"
+           aria-current="page">
+          <i data-lucide="smartphone" class="w-4 h-4"></i>应用管理
+        </a>
+        <a href="levels.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant
+                           hover:bg-surface-container hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="layers" class="w-4 h-4"></i>等级管理
+        </a>
+      </div>
+    </aside>
+    <!-- @nav:end -->
+
+    <!-- @main-content:start -->
+    <main class="flex-1 min-w-0 overflow-y-auto bg-background p-6">
+
+      <!-- 页面标题 -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-on-surface">应用管理</h1>
+        <p class="text-sm text-on-surface-variant mt-1">管理所有 App 应用及其广告配置</p>
+      </div>
+
+      <!-- 顶部操作栏 -->
+      <div class="flex items-center justify-between mb-5">
+        <div class="relative w-72">
+          <i data-lucide="search" class="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input id="search-input" type="text" placeholder="按包名搜索应用..."
+                 class="w-full bg-surface-container border-none rounded-md pl-9 pr-3 py-2 text-sm
+                        text-on-surface placeholder:text-on-surface-variant/50
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"/>
+        </div>
+        <button id="btn-add-app"
+                class="bg-primary text-on-primary px-4 py-2 rounded-md text-sm font-medium
+                       hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>添加应用
+        </button>
+      </div>
+
+      <!-- 应用列表表格 -->
+      <div id="app-table" class="bg-surface rounded-lg shadow-card overflow-hidden">
+        <!-- 表头 -->
+        <div class="grid grid-cols-7 px-5 py-3 bg-surface-container text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
+          <span>应用名称</span>
+          <span>包名</span>
+          <span>广告位数量</span>
+          <span>当前Level</span>
+          <span>穿山甲媒体ID</span>
+          <span>状态</span>
+          <span>操作</span>
+        </div>
+        <!-- 表体 -->
+        <div id="app-table-body" class="divide-y divide-outline-variant/50">
+
+          <!-- 列表-应用1 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.video">
+            <span class="text-sm font-medium text-on-surface">短视频</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.video</span>
+            <span class="text-sm text-on-surface">4/4</span>
+            <span class="text-sm text-on-surface">Level 4</span>
+            <span class="text-sm text-on-surface-variant font-mono">5000546</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-success/15 text-success w-fit">已配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="1" data-name="短视频">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="1" data-name="短视频">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用2 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.novel">
+            <span class="text-sm font-medium text-on-surface">小说阅读器</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.novel</span>
+            <span class="text-sm text-on-surface">3/4</span>
+            <span class="text-sm text-on-surface">Level 3</span>
+            <span class="text-sm text-on-surface-variant font-mono">5000782</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-success/15 text-success w-fit">已配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="2" data-name="小说阅读器">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="2" data-name="小说阅读器">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用3 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.weather">
+            <span class="text-sm font-medium text-on-surface">天气预报</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.weather</span>
+            <span class="text-sm text-on-surface">0/4</span>
+            <span class="text-sm text-on-surface">Level 1</span>
+            <span class="text-sm text-on-surface-variant font-mono">5001034</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-warning/15 text-warning w-fit">未配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="3" data-name="天气预报">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="3" data-name="天气预报">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用4 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.music">
+            <span class="text-sm font-medium text-on-surface">音乐播放器</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.music</span>
+            <span class="text-sm text-on-surface">4/4</span>
+            <span class="text-sm text-on-surface">Level 5</span>
+            <span class="text-sm text-on-surface-variant font-mono">5002108</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-success/15 text-success w-fit">已配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="4" data-name="音乐播放器">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="4" data-name="音乐播放器">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用5 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.news">
+            <span class="text-sm font-medium text-on-surface">新闻资讯</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.news</span>
+            <span class="text-sm text-on-surface">2/4</span>
+            <span class="text-sm text-on-surface">Level 2</span>
+            <span class="text-sm text-on-surface-variant font-mono">5003215</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-warning/15 text-warning w-fit">未配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="5" data-name="新闻资讯">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="5" data-name="新闻资讯">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用6 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.browser">
+            <span class="text-sm font-medium text-on-surface">极速浏览器</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.browser</span>
+            <span class="text-sm text-on-surface">4/4</span>
+            <span class="text-sm text-on-surface">Level 4</span>
+            <span class="text-sm text-on-surface-variant font-mono">5004521</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-success/15 text-success w-fit">已配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="6" data-name="极速浏览器">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="6" data-name="极速浏览器">删除</button>
+            </div>
+          </div>
+
+          <!-- 列表-应用7 -->
+          <div class="app-row grid grid-cols-7 px-5 py-3.5 hover:bg-surface-container/50 transition-colors items-center" data-package="com.san.game">
+            <span class="text-sm font-medium text-on-surface">休闲游戏</span>
+            <span class="text-sm text-on-surface-variant font-mono">com.san.game</span>
+            <span class="text-sm text-on-surface">1/4</span>
+            <span class="text-sm text-on-surface">Level 2</span>
+            <span class="text-sm text-on-surface-variant font-mono">5005677</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-warning/15 text-warning w-fit">未配置</span>
+            <div class="flex gap-3">
+              <button class="btn-config text-primary text-sm font-medium hover:underline" data-id="7" data-name="休闲游戏">配置</button>
+              <button class="btn-delete text-error text-sm font-medium hover:underline" data-id="7" data-name="休闲游戏">删除</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 空状态提示 -->
+      <div id="empty-state" class="hidden py-16 flex flex-col items-center justify-center">
+        <i data-lucide="search-x" class="w-12 h-12 text-on-surface-variant/40 mb-4"></i>
+        <p class="text-base font-medium text-on-surface-variant">未找到匹配的应用</p>
+        <p class="text-sm text-on-surface-variant/60 mt-1">请尝试其他包名关键词搜索</p>
+      </div>
+
+    </main>
+    <!-- @main-content:end -->
+  </div>
+
+  <!-- 添加应用对话框 -->
+  <div id="modal-add-app" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-surface rounded-xl shadow-dialog max-w-md w-full max-h-[90vh] overflow-y-auto p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-on-surface">添加应用</h2>
+        <button id="btn-modal-close" class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-surface-container transition-colors">
+          <i data-lucide="x" class="w-4 h-4 text-on-surface-variant"></i>
+        </button>
+      </div>
+      <form id="form-add-app" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-on-surface mb-1.5">应用名称</label>
+          <input id="input-app-name" type="text" placeholder="如：短视频"
+                 class="w-full bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                        text-on-surface placeholder:text-on-surface-variant/50
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-on-surface mb-1.5">包名</label>
+          <input id="input-package-name" type="text" placeholder="如：com.san.video"
+                 class="w-full bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                        text-on-surface placeholder:text-on-surface-variant/50
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-on-surface mb-1.5">穿山甲媒体ID</label>
+          <input id="input-media-id" type="text" placeholder="如：5000546"
+                 class="w-full bg-surface-container border-none rounded-md px-3 py-2 text-sm
+                        text-on-surface placeholder:text-on-surface-variant/50
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"/>
+        </div>
+      </form>
+      <div class="flex justify-end gap-3 mt-6">
+        <button id="btn-modal-cancel"
+                class="bg-surface-container text-on-surface border-none px-4 py-2 rounded-md text-sm font-medium
+                       hover:bg-surface-container-high active:scale-[0.98] transition-all">取消</button>
+        <button id="btn-modal-confirm"
+                class="bg-primary text-on-primary px-4 py-2 rounded-md text-sm font-medium
+                       hover:opacity-90 active:scale-[0.98] transition-all">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认对话框 -->
+  <div id="modal-delete" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-surface rounded-xl shadow-dialog max-w-sm w-full max-h-[90vh] overflow-y-auto p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center shrink-0">
+          <i data-lucide="trash-2" class="w-5 h-5 text-error"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-on-surface">确认删除</h2>
+          <p id="delete-app-name" class="text-sm text-on-surface-variant mt-0.5">确定要删除应用「短视频」吗？此操作不可撤销。</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-5">
+        <button id="btn-delete-cancel"
+                class="bg-surface-container text-on-surface border-none px-4 py-2 rounded-md text-sm font-medium
+                       hover:bg-surface-container-high active:scale-[0.98] transition-all">取消</button>
+        <button id="btn-delete-confirm"
+                class="bg-error text-on-primary px-4 py-2 rounded-md text-sm font-medium
+                       hover:opacity-90 active:scale-[0.98] transition-all">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(function () {
+
+      // === 搜索功能 ===
+      $('#search-input').on('input', function () {
+        var keyword = $(this).val().trim().toLowerCase();
+        var $rows = $('#app-table-body .app-row');
+        var visibleCount = 0;
+
+        $rows.each(function () {
+          var packageName = $(this).data('package').toString().toLowerCase();
+          if (keyword === '' || packageName.indexOf(keyword) !== -1) {
+            $(this).show();
+            visibleCount++;
+          } else {
+            $(this).hide();
+          }
+        });
+
+        if (visibleCount === 0 && keyword !== '') {
+          $('#app-table').hide();
+          $('#empty-state').removeClass('hidden').addClass('flex');
+        } else {
+          $('#app-table').show();
+          $('#empty-state').addClass('hidden').removeClass('flex');
+        }
+      });
+
+      // === 添加应用对话框 ===
+      $('#btn-add-app').on('click', function () {
+        $('#modal-add-app').removeClass('hidden');
+      });
+
+      $('#btn-modal-close').on('click', function () {
+        $('#modal-add-app').addClass('hidden');
+        $('#form-add-app')[0].reset();
+      });
+
+      $('#btn-modal-cancel').on('click', function () {
+        $('#modal-add-app').addClass('hidden');
+        $('#form-add-app')[0].reset();
+      });
+
+      // 点击遮罩层关闭对话框
+      $('#modal-add-app').on('click', function (e) {
+        if ($(e.target).is('#modal-add-app')) {
+          $('#modal-add-app').addClass('hidden');
+          $('#form-add-app')[0].reset();
+        }
+      });
+
+      $('#btn-modal-confirm').on('click', function () {
+        // 添加应用 - 后续应实现：
+        // 1. 校验表单字段（应用名称、包名、穿山甲媒体ID不能为空；包名格式校验）
+        // 2. 校验包名是否已存在
+        // 3. 调用后端接口创建应用
+        // 4. 创建成功后关闭对话框，在表格中新增一行应用记录
+        // 5. 创建失败则显示错误提示
+        var appName = $('#input-app-name').val().trim();
+        var packageName = $('#input-package-name').val().trim();
+        var mediaId = $('#input-media-id').val().trim();
+
+        if (!appName || !packageName || !mediaId) {
+          console.log('请填写完整的应用信息');
+          return;
+        }
+
+        console.log('添加应用:', { appName: appName, packageName: packageName, mediaId: mediaId });
+        $('#modal-add-app').addClass('hidden');
+        $('#form-add-app')[0].reset();
+      });
+
+      // === 配置按钮 - 跳转到 app-config.html ===
+      $('#app-table-body').on('click', '.btn-config', function () {
+        var appId = $(this).data('id');
+        var appName = $(this).data('name');
+        window.location.href = 'app-config.html?id=' + appId + '&name=' + encodeURIComponent(appName);
+      });
+
+      // === 删除功能 ===
+      var deleteTargetId = null;
+      var deleteTargetName = null;
+
+      $('#app-table-body').on('click', '.btn-delete', function () {
+        deleteTargetId = $(this).data('id');
+        deleteTargetName = $(this).data('name');
+        $('#delete-app-name').text('确定要删除应用「' + deleteTargetName + '」吗？此操作不可撤销。');
+        $('#modal-delete').removeClass('hidden');
+      });
+
+      $('#btn-delete-cancel').on('click', function () {
+        $('#modal-delete').addClass('hidden');
+        deleteTargetId = null;
+        deleteTargetName = null;
+      });
+
+      // 点击遮罩层关闭删除对话框
+      $('#modal-delete').on('click', function (e) {
+        if ($(e.target).is('#modal-delete')) {
+          $('#modal-delete').addClass('hidden');
+          deleteTargetId = null;
+          deleteTargetName = null;
+        }
+      });
+
+      $('#btn-delete-confirm').on('click', function () {
+        // 删除应用 - 后续应实现：
+        // 1. 调用后端接口删除对应 appId 的应用
+        // 2. 删除成功后从表格 DOM 中移除该行
+        // 3. 删除失败则显示错误提示
+        console.log('删除应用:', { id: deleteTargetId, name: deleteTargetName });
+
+        // 原型中直接移除行
+        if (deleteTargetId) {
+          $('#app-table-body .app-row').each(function () {
+            if ($(this).find('.btn-delete').data('id') === deleteTargetId) {
+              $(this).remove();
+            }
+          });
+        }
+
+        // 检查是否所有行都被删除
+        if ($('#app-table-body .app-row:visible').length === 0) {
+          $('#app-table').hide();
+          $('#empty-state').removeClass('hidden').addClass('flex');
+        }
+
+        $('#modal-delete').addClass('hidden');
+        deleteTargetId = null;
+        deleteTargetName = null;
+      });
+
+    });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>
