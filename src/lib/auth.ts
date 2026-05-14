@@ -89,16 +89,31 @@ export async function getAuthUser(request?: Request): Promise<AuthUser | null> {
   return verifyToken(token);
 }
 
-// 设置认证cookie
-export async function setAuthCookie(token: string): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set(TOKEN_NAME, token, {
+// Cookie配置项
+function getCookieOptions() {
+  // 判断是否为安全上下文（HTTPS 或 localhost）
+  // 部署环境可能通过反向代理，不能用 NODE_ENV 判断
+  const isSecure = process.env.COZE_PROJECT_ENV === 'PROD';
+  return {
+    name: TOKEN_NAME,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isSecure,
+    sameSite: 'lax' as const,
     maxAge: TOKEN_MAX_AGE,
     path: '/',
-  });
+  };
+}
+
+// 获取Cookie配置（供Route Handler使用）
+export function getAuthCookieConfig(token: string) {
+  const options = getCookieOptions();
+  return { ...options, value: token };
+}
+
+// 设置认证cookie（兼容方式：通过NextResponse设置）
+export async function setAuthCookie(token: string): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set(TOKEN_NAME, token, getCookieOptions());
 }
 
 // 清除认证cookie

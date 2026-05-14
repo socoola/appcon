@@ -30,7 +30,13 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await res.json();
+      let data: { error?: string; data?: unknown };
+      try {
+        data = await res.json();
+      } catch {
+        setError('服务器响应异常，请稍后重试');
+        return;
+      }
 
       if (!res.ok) {
         setError(data.error || '登录失败');
@@ -40,7 +46,7 @@ export default function LoginPage() {
       router.push('/');
       router.refresh();
     } catch {
-      setError('网络错误，请重试');
+      setError('网络错误，请检查网络连接后重试');
     } finally {
       setLoading(false);
     }
