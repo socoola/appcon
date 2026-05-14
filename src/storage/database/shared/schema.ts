@@ -45,6 +45,26 @@ export const adSlots = pgTable(
 	]
 );
 
+// 用户表 - 管理后台用户
+export const users = pgTable(
+	"users",
+	{
+		id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+		username: varchar("username", { length: 64 }).notNull().unique(),    // 用户名（唯一）
+		password_hash: varchar("password_hash", { length: 255 }).notNull(),  // 密码hash
+		display_name: varchar("display_name", { length: 64 }),               // 显示名称
+		role: varchar("role", { length: 20 }).notNull().default("viewer"),   // 角色: admin / operator / viewer
+		status: varchar("status", { length: 20 }).notNull().default("active"), // 状态: active / disabled
+		last_login_at: timestamp("last_login_at", { withTimezone: true }),
+		created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+		updated_at: timestamp("updated_at", { withTimezone: true }),
+	},
+	(table) => [
+		index("users_username_idx").on(table.username),
+		index("users_role_idx").on(table.role),
+	]
+);
+
 // 广告配置请求日志表 - 保存24小时
 export const adConfigLogs = pgTable(
 	"ad_config_logs",
