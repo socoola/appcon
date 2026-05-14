@@ -40,7 +40,7 @@ export default function UsersPage() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch('/api/users');
+      const res = await fetch('/api/users', { credentials: 'include' });
       if (res.status === 403) return;
       const data = await res.json();
       setUsers(data.data || []);
@@ -59,6 +59,7 @@ export default function UsersPage() {
     if (!newUsername.trim() || !newPassword.trim()) return;
     const res = await fetch('/api/users', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: newUsername,
@@ -90,6 +91,7 @@ export default function UsersPage() {
 
     const res = await fetch(`/api/users/${editUser.id}`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
@@ -104,7 +106,7 @@ export default function UsersPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('确认删除该用户？')) return;
-    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/users/${id}`, { method: 'DELETE', credentials: 'include' });
     if (res.ok) {
       fetchUsers();
     } else {

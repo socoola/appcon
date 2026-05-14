@@ -34,7 +34,7 @@ export default function LevelsPage() {
   const [original, setOriginal] = useState<AdLevel[]>([]);
 
   const fetchLevels = useCallback(async () => {
-    const res = await fetch('/api/levels');
+    const res = await fetch('/api/levels', { credentials: 'include' });
     const json = await res.json();
     setLevels(json.data || []);
     setOriginal(json.data || []);
@@ -61,6 +61,7 @@ export default function LevelsPage() {
     try {
       await fetch('/api/levels', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           levels: levels.map((l) => ({

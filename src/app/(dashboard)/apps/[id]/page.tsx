@@ -50,8 +50,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/apps/${id}`).then((r) => r.json()),
-      fetch(`/api/apps/${id}/slots`).then((r) => r.json()),
+      fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
+      fetch(`/api/apps/${id}/slots`, { credentials: 'include' }).then((r) => r.json()),
     ]).then(([appRes, slotsRes]) => {
       if (appRes.data) {
         setApp(appRes.data);
@@ -75,6 +75,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       // 更新Level
       await fetch(`/api/apps/${id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level }),
       });
@@ -82,6 +83,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       // 更新广告位
       await fetch(`/api/apps/${id}/slots`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           slots: slots.map((s) => ({
@@ -104,7 +106,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     if (!app) return;
     setLevel(app.level);
     // 重新获取数据
-    fetch(`/api/apps/${id}/slots`)
+    fetch(`/api/apps/${id}/slots`, { credentials: 'include' })
       .then((r) => r.json())
       .then((res) => {
         if (res.data) setSlots(res.data);

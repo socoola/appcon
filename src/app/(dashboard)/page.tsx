@@ -29,7 +29,7 @@ export default function HomePage() {
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
-    fetch('/api/stats')
+    fetch('/api/stats', { credentials: 'include' })
       .then((res) => res.json())
       .then((res) => setStats(res.data))
       .catch(() => {});

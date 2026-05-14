@@ -34,7 +34,7 @@ export default function AppsPage() {
 
   const fetchApps = useCallback(async () => {
     const params = search ? `?search=${encodeURIComponent(search)}` : '';
-    const res = await fetch(`/api/apps${params}`);
+    const res = await fetch(`/api/apps${params}`, { credentials: 'include' });
     const json = await res.json();
     setApps(json.data || []);
   }, [search]);
@@ -49,6 +49,7 @@ export default function AppsPage() {
     try {
       const res = await fetch('/api/apps', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(addForm),
       });
@@ -67,7 +68,7 @@ export default function AppsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('确认删除该应用？此操作不可撤销。')) return;
-    const res = await fetch(`/api/apps/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/apps/${id}`, { method: 'DELETE', credentials: 'include' });
     if (res.ok) {
       fetchApps();
     }
