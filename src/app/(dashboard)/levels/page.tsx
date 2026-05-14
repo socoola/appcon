@@ -1,0 +1,205 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { Save, RotateCcw, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+
+interface AdLevel {
+  id: string;
+  level: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  open_screen: boolean;
+  banner: boolean;
+  incentive_video: boolean;
+  insert_full_screen: boolean;
+}
+
+const slotFields = [
+  { key: 'open_screen' as const, label: '开屏广告' },
+  { key: 'banner' as const, label: 'Banner广告' },
+  { key: 'incentive_video' as const, label: '激励视频' },
+  { key: 'insert_full_screen' as const, label: '插屏全屏' },
+];
+
+export default function LevelsPage() {
+  const [levels, setLevels] = useState<AdLevel[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [original, setOriginal] = useState<AdLevel[]>([]);
+
+  const fetchLevels = useCallback(async () => {
+    const res = await fetch('/api/levels');
+    const json = await res.json();
+    setLevels(json.data || []);
+    setOriginal(json.data || []);
+  }, []);
+
+  useEffect(() => {
+    fetchLevels();
+  }, [fetchLevels]);
+
+  const handleFieldChange = (id: string, field: string, value: unknown) => {
+    setLevels((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, [field]: value } : l))
+    );
+  };
+
+  const handleDefaultChange = (id: string) => {
+    setLevels((prev) =>
+      prev.map((l) => ({ ...l, is_default: l.id === id }))
+    );
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await fetch('/api/levels', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levels: levels.map((l) => ({
+            id: l.id,
+            name: l.name,
+            description: l.description,
+            is_default: l.is_default,
+            open_screen: l.open_screen,
+            banner: l.banner,
+            incentive_video: l.incentive_video,
+            insert_full_screen: l.insert_full_screen,
+          })),
+        }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      fetchLevels();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    setLevels([...original]);
+  };
+
+  const getEnabledCount = (level: AdLevel) => {
+    return [level.open_screen, level.banner, level.incentive_video, level.insert_full_screen].filter(Boolean).length;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* 页面标题 */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">等级管理</h1>
+        <p className="text-sm text-muted-foreground mt-1">配置每个等级包含的广告位类型</p>
+      </div>
+
+      {/* 说明卡片 */}
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
+        <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+        <div className="text-sm text-foreground">
+          等级越高，展示的广告位越多。客户端通过API返回的 <code className="bg-muted px-1.5 py-0.5 rounded font-mono text-xs">level</code> 字段控制广告展示策略。
+        </div>
+      </div>
+
+      {/* 等级配置列表 */}
+      <div className="space-y-4">
+        {levels.map((levelItem) => {
+          const enabledCount = getEnabledCount(levelItem);
+          const isZeroLevel = levelItem.level === 0;
+
+          return (
+            <Card
+              key={levelItem.id}
+              className={`p-5 shadow-card border-none ${levelItem.is_default ? 'ring-2 ring-primary/20' : ''}`}
+            >
+              <div className="flex items-start gap-6">
+                {/* 左侧：等级信息 */}
+                <div className="w-48 shrink-0 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-foreground">Level {levelItem.level}</span>
+                    {levelItem.is_default && (
+                      <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/10">默认</Badge>
+                    )}
+                  </div>
+                  <Input
+                    className="bg-muted border-none text-sm"
+                    value={levelItem.name}
+                    onChange={(e) => handleFieldChange(levelItem.id, 'name', e.target.value)}
+                    disabled={isZeroLevel}
+                  />
+                  <Input
+                    className="bg-muted border-none text-xs text-muted-foreground"
+                    placeholder="等级说明"
+                    value={levelItem.description || ''}
+                    onChange={(e) => handleFieldChange(levelItem.id, 'description', e.target.value)}
+                    disabled={isZeroLevel}
+                  />
+                </div>
+
+                {/* 右侧：广告位开关 */}
+                <div className="flex-1">
+                  <div className="grid grid-cols-4 gap-4">
+                    {slotFields.map((slot) => (
+                      <div
+                        key={slot.key}
+                        className={`flex items-center justify-between p-3 rounded-lg ${
+                          isZeroLevel
+                            ? 'bg-muted/30'
+                            : levelItem[slot.key]
+                            ? 'bg-success/5'
+                            : 'bg-muted/30'
+                        }`}
+                      >
+                        <span className={`text-sm ${isZeroLevel ? 'text-muted-foreground/50' : levelItem[slot.key] ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {slot.label}
+                        </span>
+                        <Switch
+                          checked={levelItem[slot.key]}
+                          onCheckedChange={(v) => handleFieldChange(levelItem.id, slot.key, v)}
+                          disabled={isZeroLevel}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 设为默认 */}
+                <div className="w-24 shrink-0 flex items-center justify-center">
+                  <Button
+                    variant={levelItem.is_default ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleDefaultChange(levelItem.id)}
+                    className={levelItem.is_default ? '' : 'text-muted-foreground'}
+                  >
+                    {levelItem.is_default ? '默认' : '设为默认'}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* 底部操作 */}
+      <div className="flex items-center gap-3">
+        <Button onClick={handleSave} disabled={saving} className="gap-2">
+          <Save className="w-4 h-4" />
+          {saving ? '保存中...' : '保存配置'}
+        </Button>
+        <Button variant="outline" onClick={handleReset} className="gap-2">
+          <RotateCcw className="w-4 h-4" />
+          重置
+        </Button>
+        {saved && (
+          <span className="text-sm text-success">配置已保存</span>
+        )}
+      </div>
+    </div>
+  );
+}
