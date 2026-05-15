@@ -54,7 +54,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-sm px-6">
+      <div className="w-full max-w-sm px-4 sm:px-6">
         <div className="bg-card rounded-2xl shadow-card p-8 border border-outline-variant/20">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2.5 mb-8">
