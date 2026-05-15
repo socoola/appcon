@@ -37,8 +37,8 @@ async function writeLog(log: LogEntry) {
       user_agent: log.user_agent,
       latency_ms: log.latency_ms,
     });
-  } catch {
-    // 日志写入失败不影响主流程
+  } catch (e) {
+    console.error('ad-config log write failed:', e);
   }
 }
 
@@ -47,8 +47,8 @@ async function cleanExpiredLogs() {
     const client = getSupabaseClient();
     const cutoff = new Date(Date.now() - LOG_RETENTION_HOURS * 60 * 60 * 1000).toISOString();
     await client.from('ad_config_logs').delete().lt('created_at', cutoff);
-  } catch {
-    // 清理失败不影响主流程
+  } catch (e) {
+    console.error('ad-config log cleanup failed:', e);
   }
 }
 
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
   // 参数校验
   if (!appId) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: '', channel, nonce,
       response_code: 40001, response_msg: '缺少app_id参数',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
   if (!timestamp) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 40001, response_msg: '缺少timestamp参数',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 
   if (!nonce) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 40001, response_msg: '缺少nonce参数',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
   const requestTime = parseInt(timestamp, 10);
   if (isNaN(requestTime)) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 40002, response_msg: 'timestamp格式无效',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
   const now = Date.now();
   if (Math.abs(now - requestTime) > TIMESTAMP_TOLERANCE_MS) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 40003, response_msg: '请求已过期，timestamp超出有效时间窗口',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
 
   if (appError) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 50001, response_msg: '数据库查询失败',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
 
   if (!app) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 40004, response_msg: '应用不存在',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
 
   if (slotsError) {
     const requestId = crypto.randomUUID();
-    writeLog({
+    await writeLog({
       request_id: requestId, app_id: appId, channel, nonce,
       response_code: 50001, response_msg: '数据库查询失败',
       level: null, slot_count: 0, ip, user_agent: userAgent,
@@ -201,7 +201,7 @@ export async function GET(request: NextRequest) {
   const latencyMs = Date.now() - startTime;
 
   // 记录成功日志
-  writeLog({
+  await writeLog({
     request_id: requestId, app_id: appId, channel, nonce,
     response_code: 10000, response_msg: 'APP广告配置获取成功',
     level: app.level, slot_count: list.length, ip, user_agent: userAgent,
