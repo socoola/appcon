@@ -7,6 +7,12 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
 const TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000; // 5分钟容忍窗口
 const LOG_RETENTION_HOURS = 24;
 const LOG_WAIT_TIMEOUT_MS = 200;
+const LOG_REQUEST_ID_MAX_LENGTH = 64;
+const LOG_CHANNEL_MAX_LENGTH = 64;
+const LOG_NONCE_MAX_LENGTH = 64;
+const LOG_IP_MAX_LENGTH = 64;
+const LOG_RESPONSE_MSG_MAX_LENGTH = 255;
+const LOG_USER_AGENT_MAX_LENGTH = 512;
 
 type LogEntry = {
   request_id: string;
@@ -22,20 +28,24 @@ type LogEntry = {
   latency_ms: number | null;
 };
 
+function truncate(value: string | null, maxLength: number): string | null {
+  return value ? value.slice(0, maxLength) : null;
+}
+
 async function writeLog(log: LogEntry) {
   try {
     const client = getSupabaseClient();
     const { error } = await client.from('ad_config_logs').insert({
-      request_id: log.request_id,
+      request_id: log.request_id.slice(0, LOG_REQUEST_ID_MAX_LENGTH),
       app_id: log.app_id,
-      channel: log.channel,
-      nonce: log.nonce,
+      channel: truncate(log.channel, LOG_CHANNEL_MAX_LENGTH),
+      nonce: truncate(log.nonce, LOG_NONCE_MAX_LENGTH),
       response_code: log.response_code,
-      response_msg: log.response_msg.slice(0, 64),
+      response_msg: log.response_msg.slice(0, LOG_RESPONSE_MSG_MAX_LENGTH),
       level: log.level,
       slot_count: log.slot_count,
-      ip: log.ip,
-      user_agent: log.user_agent ? log.user_agent.slice(0, 64) : null,
+      ip: truncate(log.ip, LOG_IP_MAX_LENGTH),
+      user_agent: truncate(log.user_agent, LOG_USER_AGENT_MAX_LENGTH),
       latency_ms: log.latency_ms,
     });
     if (error) {
@@ -77,7 +87,8 @@ export async function GET(request: NextRequest) {
   const nonce = searchParams.get('nonce');
 
   // 提取请求信息
-  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null;
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  const ip = forwardedFor?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null;
   const userAgent = request.headers.get('user-agent') || null;
 
   // 后台异步清理过期日志（不阻塞请求）
