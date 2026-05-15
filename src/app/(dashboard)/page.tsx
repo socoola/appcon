@@ -81,7 +81,7 @@ export default function HomePage() {
       </div>
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -102,7 +102,7 @@ export default function HomePage() {
       </div>
 
       {/* 下方区域 */}
-      <div className="grid grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
         {/* 广告位类型分布 */}
         <div className="col-span-3 bg-card rounded-lg p-5 shadow-card border-none">
           <h2 className="text-base font-semibold text-foreground mb-4">广告位类型分布</h2>
