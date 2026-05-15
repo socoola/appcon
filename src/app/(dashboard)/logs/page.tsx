@@ -108,7 +108,7 @@ export default function LogsPage() {
       </div>
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <div className="bg-card rounded-xl border border-outline-variant/20 p-4">
           <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
             <Activity className="w-4 h-4" />24h 请求量
@@ -136,7 +136,7 @@ export default function LogsPage() {
       </div>
 
       {/* 筛选栏 */}
-      <div className="flex items-center gap-3 bg-card rounded-xl border border-outline-variant/20 p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-card rounded-xl border border-outline-variant/20 p-4">
         <div className="flex items-center gap-2 flex-1">
           <Search className="w-4 h-4 text-muted-foreground" />
           <input
@@ -242,7 +242,7 @@ export default function LogsPage() {
 
         {/* 分页 */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-outline-variant/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-3 border-t border-outline-variant/20">
             <span className="text-sm text-muted-foreground">
               共 {pagination.total} 条，第 {pagination.page}/{pagination.totalPages} 页
             </span>
