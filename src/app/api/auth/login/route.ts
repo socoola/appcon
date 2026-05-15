@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
-import { verifyPassword, createToken, getCookieOptions, TOKEN_NAME } from '@/lib/auth';
+import { verifyPassword, createToken, getCookieOptions } from '@/lib/auth';
 
 // POST /api/auth/login
 export async function POST(request: NextRequest) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Trash2, Edit3, Shield, Eye, ShieldCheck, UserX, Check, X } from 'lucide-react';
+import { Search, Plus, Trash2, Edit3, Shield, Eye, ShieldCheck, UserX, Check } from 'lucide-react';
 
 interface UserItem {
   id: string;

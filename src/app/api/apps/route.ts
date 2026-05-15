@@ -26,12 +26,12 @@ export async function GET(request: NextRequest) {
   // 为每个应用获取广告位数量
   const appsWithSlots = await Promise.all(
     (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; level: number; status: string; created_at: string; updated_at: string | null }) => {
-      const { count: totalSlots, error: totalError } = await client
+      const { count: totalSlots } = await client
         .from('ad_slots')
         .select('*', { count: 'exact', head: true })
         .eq('app_id', app.id);
 
-      const { count: enabledSlots, error: enabledError } = await client
+      const { count: enabledSlots } = await client
         .from('ad_slots')
         .select('*', { count: 'exact', head: true })
         .eq('app_id', app.id)

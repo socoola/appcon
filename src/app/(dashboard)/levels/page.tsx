@@ -177,10 +177,6 @@ export default function LevelsPage() {
     }
   };
 
-  const getEnabledCount = (level: AdLevel) => {
-    return [level.open_screen, level.banner, level.incentive_video, level.insert_full_screen].filter(Boolean).length;
-  };
-
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
@@ -213,8 +209,6 @@ export default function LevelsPage() {
       {/* 等级配置列表 */}
       <div className="space-y-4">
         {levels.map((levelItem) => {
-          const enabledCount = getEnabledCount(levelItem);
-
           return (
             <Card
               key={levelItem.id}

@@ -10,16 +10,6 @@ const PUBLIC_PATHS = [
   '/api/auth/login',
 ];
 
-// 只需要登录即可访问的路径（任何角色）
-const AUTH_ONLY_PATHS = [
-  '/api/auth/me',
-  '/api/auth/logout',
-  '/api/apps',         // GET
-  '/api/levels',       // GET
-  '/api/stats',
-  '/api/logs',
-];
-
 // 仅管理员可访问的路径
 const ADMIN_PATHS = [
   '/api/users',
