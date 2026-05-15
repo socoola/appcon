@@ -31,11 +31,11 @@ async function writeLog(log: LogEntry) {
       channel: log.channel,
       nonce: log.nonce,
       response_code: log.response_code,
-      response_msg: log.response_msg,
+      response_msg: log.response_msg.slice(0, 64),
       level: log.level,
       slot_count: log.slot_count,
       ip: log.ip,
-      user_agent: log.user_agent,
+      user_agent: log.user_agent ? log.user_agent.slice(0, 64) : null,
       latency_ms: log.latency_ms,
     });
     if (error) {
