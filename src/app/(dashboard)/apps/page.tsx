@@ -113,8 +113,8 @@ export default function AppsPage() {
       </div>
 
       {/* 操作栏 */}
-      <div className="flex items-center justify-between">
-        <div className="relative w-80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="搜索包名..."
@@ -123,14 +123,14 @@ export default function AppsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button onClick={() => setShowAdd(true)} className="gap-2">
+        <Button onClick={() => setShowAdd(true)} className="gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           添加应用
         </Button>
       </div>
 
       {/* 应用列表表格 */}
-      <div className="bg-card rounded-lg shadow-card border-none overflow-hidden">
+      <div className="hidden md:block bg-card rounded-lg shadow-card border-none overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-outline-variant/20">
@@ -198,9 +198,53 @@ export default function AppsPage() {
         </table>
       </div>
 
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {apps.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground bg-card rounded-lg shadow-card">
+            {search ? '未找到匹配的应用' : '暂无应用，点击上方按钮添加'}
+          </div>
+        ) : (
+          apps.map((app) => (
+            <div key={app.id} className="bg-card rounded-lg p-4 shadow-card">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="font-medium text-foreground">{app.name}</div>
+                  <div className="text-xs text-muted-foreground font-mono mt-0.5">{app.package_name}</div>
+                </div>
+                {app.enabled_slots === app.total_slots && app.total_slots > 0 ? (
+                  <Badge className="bg-success/10 text-success border-none shrink-0">已配置</Badge>
+                ) : (
+                  <Badge className="bg-warning/10 text-warning border-none shrink-0">未配置</Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                <span>广告位 <span className="text-primary font-medium">{app.enabled_slots}</span>/{app.total_slots}</span>
+                <span>Level {app.level} {getLevelName(app.level)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link href={`/apps/${app.id}`} className="flex-1">
+                  <Button variant="outline" size="sm" className="w-full gap-1.5">
+                    <Settings className="w-3.5 h-3.5" /> 配置
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-destructive hover:text-destructive"
+                  onClick={() => handleDelete(app.id)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
       {/* 添加应用对话框 */}
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-w-[calc(100%-2rem)]">
           <DialogHeader>
             <DialogTitle>添加新应用</DialogTitle>
           </DialogHeader>
