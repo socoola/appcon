@@ -184,12 +184,12 @@ export default function LevelsPage() {
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">等级管理</h1>
           <p className="text-sm text-muted-foreground mt-1">配置每个等级包含的广告位类型</p>
         </div>
-        <Button onClick={handleAdd} disabled={adding} className="gap-2">
+        <Button onClick={handleAdd} disabled={adding} className="gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           {adding ? '添加中...' : '添加等级'}
         </Button>
@@ -220,7 +220,7 @@ export default function LevelsPage() {
               key={levelItem.id}
               className={`p-5 shadow-card border-none ${levelItem.is_default ? 'ring-2 ring-primary/20' : ''}`}
             >
-              <div className="flex items-start gap-6">
+              <div className="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
                 {/* 左侧：等级信息 */}
                 <div className="w-48 shrink-0 space-y-2">
                   <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function LevelsPage() {
 
                 {/* 右侧：广告位开关 */}
                 <div className="flex-1">
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {slotFields.map((slot) => (
                       <div
                         key={slot.key}
@@ -267,7 +267,7 @@ export default function LevelsPage() {
                 </div>
 
                 {/* 操作区：设为默认 + 删除 */}
-                <div className="w-32 shrink-0 flex flex-col items-center gap-2">
+                <div className="w-full lg:w-32 shrink-0 flex flex-row lg:flex-col items-center justify-center lg:items-center gap-2 mt-3 lg:mt-0">
                   <Button
                     variant={levelItem.is_default ? 'default' : 'outline'}
                     size="sm"
