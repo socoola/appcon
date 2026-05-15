@@ -140,7 +140,7 @@ export default function UsersPage() {
       {/* 权限说明 */}
       <div className="bg-surface-container rounded-xl p-4 border border-outline-variant/20">
         <h3 className="text-sm font-medium text-foreground mb-2">权限说明</h3>
-        <div className="grid grid-cols-3 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 font-medium text-primary">
               <ShieldCheck className="w-3.5 h-3.5" />管理员
@@ -163,20 +163,20 @@ export default function UsersPage() {
       </div>
 
       {/* 操作栏 */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-muted border-none rounded-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 w-64"
+            className="bg-muted border-none rounded-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 w-full sm:w-64"
             placeholder="搜索用户名..."
           />
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
+          className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           添加用户
@@ -184,86 +184,144 @@ export default function UsersPage() {
       </div>
 
       {/* 用户表格 */}
-      <div className="bg-card rounded-xl border border-outline-variant/20 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-outline-variant/20">
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">用户名</th>
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">显示名称</th>
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">角色</th>
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">状态</th>
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">最后登录</th>
-              <th className="text-left px-4 py-3 text-muted-foreground font-medium">创建时间</th>
-              <th className="text-right px-4 py-3 text-muted-foreground font-medium">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((u) => {
-              const roleInfo = roleLabels[u.role] || roleLabels.viewer;
-              const RoleIcon = roleInfo.icon;
-              return (
-                <tr key={u.id} className="border-b border-outline-variant/10 hover:bg-muted/50">
-                  <td className="px-4 py-3 font-medium text-foreground">{u.username}</td>
-                  <td className="px-4 py-3 text-foreground">{u.display_name || '-'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${roleInfo.color}`}>
-                      <RoleIcon className="w-3 h-3" />
-                      {roleInfo.label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {u.status === 'active' ? (
-                      <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
-                        <Check className="w-3 h-3" />启用
+      <div className="hidden md:block">
+        <div className="bg-card rounded-xl border border-outline-variant/20 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-outline-variant/20">
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">用户名</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">显示名称</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">角色</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">状态</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">最后登录</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">创建时间</th>
+                <th className="text-right px-4 py-3 text-muted-foreground font-medium">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((u) => {
+                const roleInfo = roleLabels[u.role] || roleLabels.viewer;
+                const RoleIcon = roleInfo.icon;
+                return (
+                  <tr key={u.id} className="border-b border-outline-variant/10 hover:bg-muted/50">
+                    <td className="px-4 py-3 font-medium text-foreground">{u.username}</td>
+                    <td className="px-4 py-3 text-foreground">{u.display_name || '-'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${roleInfo.color}`}>
+                        <RoleIcon className="w-3 h-3" />
+                        {roleInfo.label}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-destructive">
-                        <UserX className="w-3 h-3" />禁用
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs">
-                    {u.last_login_at ? new Date(u.last_login_at).toLocaleString('zh-CN') : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs">
-                    {new Date(u.created_at).toLocaleString('zh-CN')}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => {
-                          setEditUser(u);
-                          setEditDisplayName(u.display_name || '');
-                          setEditRole(u.role);
-                          setEditStatus(u.status);
-                          setEditPassword('');
-                        }}
-                        className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                        title="编辑"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(u.id)}
-                        className="p-1.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                        title="删除"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {u.status === 'active' ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                          <Check className="w-3 h-3" />启用
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-destructive">
+                          <UserX className="w-3 h-3" />禁用
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      {u.last_login_at ? new Date(u.last_login_at).toLocaleString('zh-CN') : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      {new Date(u.created_at).toLocaleString('zh-CN')}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => {
+                            setEditUser(u);
+                            setEditDisplayName(u.display_name || '');
+                            setEditRole(u.role);
+                            setEditStatus(u.status);
+                            setEditPassword('');
+                          }}
+                          className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                          title="编辑"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(u.id)}
+                          className="p-1.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                          title="删除"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
+                    暂无用户数据
                   </td>
                 </tr>
-              );
-            })}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
-                  暂无用户数据
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {filtered.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-outline-variant/20">
+            暂无用户数据
+          </div>
+        ) : (
+          filtered.map((u) => {
+            const roleInfo = roleLabels[u.role] || roleLabels.viewer;
+            const RoleIcon = roleInfo.icon;
+            return (
+              <div key={u.id} className="bg-card rounded-xl border border-outline-variant/20 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-medium text-foreground">{u.username}</div>
+                    <div className="text-xs text-muted-foreground">{u.display_name || '-'}</div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${roleInfo.color} shrink-0`}>
+                    <RoleIcon className="w-3 h-3" />
+                    {roleInfo.label}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                  {u.status === 'active' ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-600"><Check className="w-3 h-3" />启用</span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-destructive"><UserX className="w-3 h-3" />禁用</span>
+                  )}
+                  <span>创建: {new Date(u.created_at).toLocaleDateString('zh-CN')}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditUser(u);
+                      setEditDisplayName(u.display_name || '');
+                      setEditRole(u.role);
+                      setEditStatus(u.status);
+                      setEditPassword('');
+                    }}
+                    className="flex-1 py-2 rounded-lg border border-outline-variant/20 text-sm text-foreground hover:bg-muted transition-colors"
+                  >
+                    编辑
+                  </button>
+                  <button
+                    onClick={() => handleDelete(u.id)}
+                    className="py-2 px-4 rounded-lg border border-outline-variant/20 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* 添加用户弹窗 */}
