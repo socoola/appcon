@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   let query = client
     .from('apps')
-    .select('id, name, package_name, media_id, level, status, created_at, updated_at')
+    .select('id, name, package_name, media_id, level, report, status, created_at, updated_at')
     .order('created_at', { ascending: false });
 
   if (search) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   // 为每个应用获取广告位数量
   const appsWithSlots = await Promise.all(
-    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; level: number; status: string; created_at: string; updated_at: string | null }) => {
+    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; level: number; report: boolean; status: string; created_at: string; updated_at: string | null }) => {
       const { count: totalSlots } = await client
         .from('ad_slots')
         .select('*', { count: 'exact', head: true })
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 // POST /api/apps - 创建应用
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, package_name, media_id, level } = body;
+  const { name, package_name, media_id, level, report } = body;
 
   if (!name || !package_name) {
     return NextResponse.json({ error: '应用名称和包名为必填项' }, { status: 400 });
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
       package_name,
       media_id: media_id || null,
       level: level ?? 4,
+      report: report ?? false,
       status: 'active',
     })
     .select()

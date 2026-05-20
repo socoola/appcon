@@ -20,7 +20,7 @@ export async function GET() {
 // POST /api/levels - 添加等级
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, description, level, is_default, open_screen, banner, incentive_video, insert_full_screen, report } = body as {
+  const { name, description, level, is_default, open_screen, banner, incentive_video, insert_full_screen } = body as {
     name: string;
     description?: string;
     level?: number;
@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     banner?: boolean;
     incentive_video?: boolean;
     insert_full_screen?: boolean;
-    report?: boolean;
   };
 
   if (!name) {
@@ -79,7 +78,6 @@ export async function POST(request: NextRequest) {
       banner: banner ?? false,
       incentive_video: incentive_video ?? false,
       insert_full_screen: insert_full_screen ?? false,
-      report: report ?? false,
     })
     .select()
     .single();
@@ -104,7 +102,6 @@ export async function PUT(request: NextRequest) {
       banner?: boolean;
       incentive_video?: boolean;
       insert_full_screen?: boolean;
-      report?: boolean;
     }>
   };
 
@@ -133,7 +130,6 @@ export async function PUT(request: NextRequest) {
       if (level.banner !== undefined) updateData.banner = level.banner;
       if (level.incentive_video !== undefined) updateData.incentive_video = level.incentive_video;
       if (level.insert_full_screen !== undefined) updateData.insert_full_screen = level.insert_full_screen;
-      if (level.report !== undefined) updateData.report = level.report;
 
       const { data, error } = await client
         .from('ad_levels')

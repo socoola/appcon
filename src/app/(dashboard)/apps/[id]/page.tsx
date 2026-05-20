@@ -22,6 +22,7 @@ interface AppInfo {
   package_name: string;
   media_id: string | null;
   level: number;
+  report: boolean;
 }
 
 interface AdSlot {
@@ -44,7 +45,6 @@ interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
-  report: boolean;
 }
 
 export default function AppConfigPage({ params }: { params: Promise<{ id: string }> }) {
@@ -53,6 +53,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [slots, setSlots] = useState<AdSlot[]>([]);
   const [levels, setLevels] = useState<AdLevel[]>([]);
   const [level, setLevel] = useState(4);
+  const [report, setReport] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -65,6 +66,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       if (appRes.data) {
         setApp(appRes.data);
         setLevel(appRes.data.level);
+        setReport(appRes.data.report ?? false);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -84,12 +86,12 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const handleSave = async () => {
     setSaving(true);
     try {
-      // 更新Level
+      // 更新基础配置
       await fetch(`/api/apps/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level }),
+        body: JSON.stringify({ level, report }),
       });
 
       // 更新广告位
@@ -117,12 +119,21 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const handleReset = () => {
     if (!app) return;
     setLevel(app.level);
+    setReport(app.report);
     // 重新获取数据
-    fetch(`/api/apps/${id}/slots`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.data) setSlots(res.data);
-      });
+    Promise.all([
+      fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
+      fetch(`/api/apps/${id}/slots`, { credentials: 'include' }).then((r) => r.json()),
+    ]).then(([appRes, slotsRes]) => {
+      if (appRes.data) {
+        setApp(appRes.data);
+        setLevel(appRes.data.level);
+        setReport(appRes.data.report ?? false);
+      }
+      if (slotsRes.data) {
+        setSlots(slotsRes.data);
+      }
+    });
   };
 
   // 获取当前 level 配置，用于预览过滤
@@ -147,7 +158,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const apiPreview = {
     request_id: 'preview-xxx',
     code: 10000,
-    data: { list: previewList, level, report: currentLevelConfig?.report ? 1 : 0 },
+    data: { list: previewList, level, report: report ? 1 : 0 },
     msg: 'APP广告配置获取成功',
   };
 
@@ -179,7 +190,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       {/* 基本信息卡片 */}
       <Card className="p-5 shadow-card border-none">
         <h2 className="text-base font-semibold text-foreground mb-4">基本信息</h2>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-5 gap-6">
           <div>
             <label className="text-xs text-muted-foreground">应用名称</label>
             <div className="text-sm font-medium text-foreground mt-1">{app.name}</div>
@@ -217,6 +228,13 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             {currentLevelConfig && (
               <p className="text-xs text-muted-foreground mt-1.5">{currentLevelConfig.description}</p>
             )}
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Report</label>
+            <div className="mt-2 flex h-10 items-center justify-between rounded-md bg-muted px-3">
+              <span className="text-sm text-foreground">{report ? '打开' : '关闭'}</span>
+              <Switch checked={report} onCheckedChange={setReport} />
+            </div>
           </div>
         </div>
       </Card>
@@ -333,8 +351,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
               {name}: {enabled ? '开' : '关'}
             </Badge>
           ))}
-          <Badge className={currentLevelConfig?.report ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
-            report: {currentLevelConfig?.report ? '1' : '0'}
+          <Badge className={report ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            report: {report ? '1' : '0'}
           </Badge>
         </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">

@@ -37,6 +37,7 @@ type AppRecord = {
   id: string;
   media_id: string | null;
   level: number;
+  report: boolean;
 };
 
 type SlotRecord = {
@@ -50,7 +51,6 @@ type LevelConfigRecord = {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
-  report: boolean;
 };
 
 type QueryError = {
@@ -205,7 +205,7 @@ async function loadAdConfig(appId: string): Promise<AdConfigLookupResult> {
       const appResult = await withTimeout(
         client
           .from('apps')
-          .select('id, media_id, level')
+          .select('id, media_id, level, report')
           .eq('package_name', appId)
           .maybeSingle(),
         MAIN_QUERY_TIMEOUT_MS,
@@ -259,7 +259,7 @@ async function loadAdConfig(appId: string): Promise<AdConfigLookupResult> {
               .eq('enabled', true),
             client
               .from('ad_levels')
-              .select('open_screen, banner, incentive_video, insert_full_screen, report')
+              .select('open_screen, banner, incentive_video, insert_full_screen')
               .eq('level', app.level)
               .maybeSingle(),
           ]),
@@ -297,7 +297,7 @@ async function loadAdConfig(appId: string): Promise<AdConfigLookupResult> {
         val: slot.ad_slot_id || '',
       })),
       level: app.level,
-      report: levelConfig?.report ? 1 : 0,
+      report: app.report ? 1 : 0,
     };
 
     setCachedAdConfig(appId, data);

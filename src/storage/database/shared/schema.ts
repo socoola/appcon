@@ -7,6 +7,7 @@
 // package_name: varchar(255) NOT NULL UNIQUE
 // media_id: varchar(64)
 // level: integer NOT NULL DEFAULT 4
+// report: boolean NOT NULL DEFAULT false
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()
 // updated_at: timestamptz
@@ -17,6 +18,7 @@ export interface App {
   package_name: string;
   media_id: string | null;
   level: number;
+  report: boolean;
   status: string;
   created_at: string;
   updated_at: string | null;
@@ -109,7 +111,6 @@ export interface AdConfigLog {
 // banner: boolean NOT NULL DEFAULT false
 // incentive_video: boolean NOT NULL DEFAULT false
 // insert_full_screen: boolean NOT NULL DEFAULT false
-// report: boolean NOT NULL DEFAULT false
 // created_at: timestamptz NOT NULL DEFAULT now()
 // updated_at: timestamptz
 
@@ -123,7 +124,6 @@ export interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
-  report: boolean;
   created_at: string;
   updated_at: string | null;
 }
