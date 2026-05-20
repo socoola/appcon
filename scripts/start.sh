@@ -9,4 +9,4 @@ DEPLOY_RUN_PORT="${DEPLOY_RUN_PORT:-$PORT}"
 cd "${COZE_WORKSPACE_PATH}"
 
 echo "Starting HTTP service on port ${DEPLOY_RUN_PORT} for deploy..."
-PORT=${DEPLOY_RUN_PORT} pnpm next start
+PORT=${DEPLOY_RUN_PORT} pnpm exec next start
