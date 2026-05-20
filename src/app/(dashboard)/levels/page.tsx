@@ -18,6 +18,7 @@ interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
+  report: boolean;
 }
 
 const slotFields = [
@@ -25,6 +26,7 @@ const slotFields = [
   { key: 'banner' as const, label: 'Banner广告' },
   { key: 'incentive_video' as const, label: '激励视频' },
   { key: 'insert_full_screen' as const, label: '插屏全屏' },
+  { key: 'report' as const, label: 'Report上报' },
 ];
 
 export default function LevelsPage() {
@@ -81,6 +83,7 @@ export default function LevelsPage() {
             banner: l.banner,
             incentive_video: l.incentive_video,
             insert_full_screen: l.insert_full_screen,
+            report: l.report,
           })),
         }),
       });
@@ -128,6 +131,7 @@ export default function LevelsPage() {
           banner: false,
           incentive_video: false,
           insert_full_screen: false,
+          report: false,
         }),
       });
       if (res.status === 401) {

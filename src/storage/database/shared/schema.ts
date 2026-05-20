@@ -109,6 +109,7 @@ export interface AdConfigLog {
 // banner: boolean NOT NULL DEFAULT false
 // incentive_video: boolean NOT NULL DEFAULT false
 // insert_full_screen: boolean NOT NULL DEFAULT false
+// report: boolean NOT NULL DEFAULT false
 // created_at: timestamptz NOT NULL DEFAULT now()
 // updated_at: timestamptz
 
@@ -122,6 +123,7 @@ export interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
+  report: boolean;
   created_at: string;
   updated_at: string | null;
 }

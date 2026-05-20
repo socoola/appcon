@@ -35,6 +35,7 @@ interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
+  report: boolean;
 }
 
 export default function AppsPage() {

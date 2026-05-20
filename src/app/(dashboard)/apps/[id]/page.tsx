@@ -44,6 +44,7 @@ interface AdLevel {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
+  report: boolean;
 }
 
 export default function AppConfigPage({ params }: { params: Promise<{ id: string }> }) {
@@ -146,7 +147,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const apiPreview = {
     request_id: 'preview-xxx',
     code: 10000,
-    data: { list: previewList, level },
+    data: { list: previewList, level, report: currentLevelConfig?.report ? 1 : 0 },
     msg: 'APP广告配置获取成功',
   };
 
@@ -332,6 +333,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
               {name}: {enabled ? '开' : '关'}
             </Badge>
           ))}
+          <Badge className={currentLevelConfig?.report ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            report: {currentLevelConfig?.report ? '1' : '0'}
+          </Badge>
         </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
           {JSON.stringify(apiPreview, null, 2)}

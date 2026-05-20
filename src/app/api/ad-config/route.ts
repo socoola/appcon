@@ -50,6 +50,7 @@ type LevelConfigRecord = {
   banner: boolean;
   incentive_video: boolean;
   insert_full_screen: boolean;
+  report: boolean;
 };
 
 type QueryError = {
@@ -63,6 +64,7 @@ type AdConfigData = {
     val: string;
   }>;
   level: number;
+  report: number;
 };
 
 type CachedAdConfig = {
@@ -257,7 +259,7 @@ async function loadAdConfig(appId: string): Promise<AdConfigLookupResult> {
               .eq('enabled', true),
             client
               .from('ad_levels')
-              .select('open_screen, banner, incentive_video, insert_full_screen')
+              .select('open_screen, banner, incentive_video, insert_full_screen, report')
               .eq('level', app.level)
               .maybeSingle(),
           ]),
@@ -295,6 +297,7 @@ async function loadAdConfig(appId: string): Promise<AdConfigLookupResult> {
         val: slot.ad_slot_id || '',
       })),
       level: app.level,
+      report: levelConfig?.report ? 1 : 0,
     };
 
     setCachedAdConfig(appId, data);
