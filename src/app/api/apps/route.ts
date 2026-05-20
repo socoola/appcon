@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       package_name,
       media_id: media_id || null,
       level: level ?? 4,
-      report: report ?? false,
+      report: report ?? true,
       status: 'active',
     })
     .select()

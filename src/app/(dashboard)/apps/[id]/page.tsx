@@ -53,7 +53,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [slots, setSlots] = useState<AdSlot[]>([]);
   const [levels, setLevels] = useState<AdLevel[]>([]);
   const [level, setLevel] = useState(4);
-  const [report, setReport] = useState(false);
+  const [report, setReport] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -66,7 +66,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       if (appRes.data) {
         setApp(appRes.data);
         setLevel(appRes.data.level);
-        setReport(appRes.data.report ?? false);
+        setReport(appRes.data.report ?? true);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -128,7 +128,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       if (appRes.data) {
         setApp(appRes.data);
         setLevel(appRes.data.level);
-        setReport(appRes.data.report ?? false);
+        setReport(appRes.data.report ?? true);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);

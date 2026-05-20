@@ -7,7 +7,7 @@
 // package_name: varchar(255) NOT NULL UNIQUE
 // media_id: varchar(64)
 // level: integer NOT NULL DEFAULT 4
-// report: boolean NOT NULL DEFAULT false
+// report: boolean NOT NULL DEFAULT true
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()
 // updated_at: timestamptz
