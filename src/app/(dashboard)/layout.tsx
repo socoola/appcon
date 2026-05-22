@@ -31,8 +31,8 @@ interface AuthInfo {
 const navItems = [
   { href: '/', label: '仪表盘', icon: Gauge },
   { href: '/apps', label: '应用管理', icon: Smartphone },
-  { href: '/levels', label: '等级管理', icon: Layers },
-  { href: '/logs', label: '请求日志', icon: ScrollText },
+  { href: '/levels', label: '等级管理', icon: Layers, adminOnly: true },
+  { href: '/logs', label: '请求日志', icon: ScrollText, adminOnly: true },
   { href: '/users', label: '用户管理', icon: Users, adminOnly: true },
 ];
 
@@ -59,6 +59,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       })
       .finally(() => setLoading(false));
   }, [router]);
+
+  useEffect(() => {
+    if (!user) return;
+    const adminOnlyPaths = ['/levels', '/logs', '/users'];
+    if (user.role !== 'admin' && adminOnlyPaths.some((path) => pathname.startsWith(path))) {
+      router.replace('/');
+    }
+  }, [pathname, router, user]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });

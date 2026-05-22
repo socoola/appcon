@@ -1,13 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 
+async function ensureAppAccess(appId: string, userId: string | null, userRole: string | null) {
+  const client = getSupabaseClient();
+  let query = client
+    .from('apps')
+    .select('id')
+    .eq('id', appId);
+
+  if (userRole !== 'admin') {
+    query = query.eq('owner_user_id', userId || '');
+  }
+
+  const { data, error } = await query.maybeSingle();
+  return { exists: Boolean(data), error };
+}
+
 // GET /api/apps/[id] - 获取应用详情
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
   const client = getSupabaseClient();
+
+  const accessResult = await ensureAppAccess(id, userId, userRole);
+  if (accessResult.error) {
+    return NextResponse.json({ error: accessResult.error.message }, { status: 500 });
+  }
+  if (!accessResult.exists) {
+    return NextResponse.json({ error: '应用不存在' }, { status: 404 });
+  }
 
   const { data: app, error: appError } = await client
     .from('apps')
@@ -32,8 +57,18 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
   const body = await request.json();
   const client = getSupabaseClient();
+
+  const accessResult = await ensureAppAccess(id, userId, userRole);
+  if (accessResult.error) {
+    return NextResponse.json({ error: accessResult.error.message }, { status: 500 });
+  }
+  if (!accessResult.exists) {
+    return NextResponse.json({ error: '应用不存在' }, { status: 404 });
+  }
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (body.name !== undefined) updateData.name = body.name;
@@ -59,11 +94,21 @@ export async function PUT(
 
 // DELETE /api/apps/[id] - 删除应用
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
   const client = getSupabaseClient();
+
+  const accessResult = await ensureAppAccess(id, userId, userRole);
+  if (accessResult.error) {
+    return NextResponse.json({ error: accessResult.error.message }, { status: 500 });
+  }
+  if (!accessResult.exists) {
+    return NextResponse.json({ error: '应用不存在' }, { status: 404 });
+  }
 
   const { error } = await client.from('apps').delete().eq('id', id);
 

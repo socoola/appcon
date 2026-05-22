@@ -11,6 +11,10 @@ interface Stats {
   slot_distribution: Record<string, number>;
 }
 
+interface AuthInfo {
+  role: string;
+}
+
 const slotNameMap: Record<string, string> = {
   openScreenId: '开屏广告',
   bannerId: 'Banner广告',
@@ -27,8 +31,14 @@ const slotColorMap: Record<string, string> = {
 
 export default function HomePage() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [user, setUser] = useState<AuthInfo | null>(null);
 
   useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => { if (res?.data) setUser(res.data); })
+      .catch(() => {});
+
     fetch('/api/stats', { credentials: 'include' })
       .then((res) => {
         if (res.status === 401) { window.location.href = '/login'; return null; }
@@ -54,7 +64,7 @@ export default function HomePage() {
       bg: 'bg-success/10',
     },
     {
-      label: '等级配置数',
+      label: user?.role === 'admin' ? '等级配置数' : '可见等级',
       value: (stats?.level_count ?? 0) + 1,
       icon: Layers,
       color: 'text-warning',
@@ -71,6 +81,7 @@ export default function HomePage() {
 
   const totalSlots = stats?.slot_count || 0;
   const distribution = stats?.slot_distribution || {};
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div className="space-y-8">
@@ -147,21 +158,23 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
             </Link>
 
-            <Link
-              href="/levels"
-              className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-warning/10 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-warning" />
+            {isAdmin && (
+              <Link
+                href="/levels"
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-warning/10 flex items-center justify-center">
+                    <Layers className="w-4 h-4 text-warning" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-foreground">配置Level</div>
+                    <div className="text-xs text-muted-foreground">管理广告等级策略</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-sm font-medium text-foreground">配置Level</div>
-                  <div className="text-xs text-muted-foreground">管理广告等级策略</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </Link>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </Link>
+            )}
 
             <Link
               href="/apps"
