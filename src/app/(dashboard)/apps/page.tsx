@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, Plus, Settings, Trash2 } from 'lucide-react';
+import { Search, Plus, Settings, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -44,6 +44,9 @@ export default function AppsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ name: '', package_name: '', media_id: '' });
   const [addLoading, setAddLoading] = useState(false);
+  const [editingApp, setEditingApp] = useState<AppItem | null>(null);
+  const [editingMediaId, setEditingMediaId] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
 
   const fetchApps = useCallback(async () => {
     const params = search ? `?search=${encodeURIComponent(search)}` : '';
@@ -101,6 +104,36 @@ export default function AppsPage() {
     const res = await fetch(`/api/apps/${id}`, { method: 'DELETE', credentials: 'include' });
     if (res.ok) {
       fetchApps();
+    }
+  };
+
+  const openMediaIdEditor = (app: AppItem) => {
+    setEditingApp(app);
+    setEditingMediaId(app.media_id || '');
+  };
+
+  const handleMediaIdSave = async () => {
+    if (!editingApp) return;
+
+    setEditLoading(true);
+    try {
+      const res = await fetch(`/api/apps/${editingApp.id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ media_id: editingMediaId.trim() || null }),
+      });
+
+      if (res.ok) {
+        setEditingApp(null);
+        setEditingMediaId('');
+        fetchApps();
+      } else {
+        const json = await res.json();
+        alert(json.error || '更新失败');
+      }
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -164,7 +197,19 @@ export default function AppsPage() {
                     <div className="text-xs text-muted-foreground">{getLevelName(app.level)}</div>
                     <div className="text-xs text-muted-foreground/70 mt-0.5">{getLevelDescription(app.level)}</div>
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-muted-foreground font-mono">{app.media_id || '-'}</td>
+                  <td className="px-5 py-3.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground font-mono">{app.media_id || '-'}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground"
+                        onClick={() => openMediaIdEditor(app)}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </td>
                   <td className="px-5 py-3.5">
                     {app.enabled_slots === app.total_slots && app.total_slots > 0 ? (
                       <Badge className="bg-success/10 text-success border-none hover:bg-success/10">已配置</Badge>
@@ -222,7 +267,18 @@ export default function AppsPage() {
                 <span>广告位 <span className="text-primary font-medium">{app.enabled_slots}</span>/{app.total_slots}</span>
                 <span>Level {app.level} {getLevelName(app.level)}</span>
               </div>
+              <div className="text-xs text-muted-foreground font-mono mb-3">
+                媒体ID：{app.media_id || '-'}
+              </div>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => openMediaIdEditor(app)}
+                >
+                  <Pencil className="w-3.5 h-3.5" /> 媒体ID
+                </Button>
                 <Link href={`/apps/${app.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full gap-1.5">
                     <Settings className="w-3.5 h-3.5" /> 配置
@@ -281,6 +337,51 @@ export default function AppsPage() {
             <Button variant="outline" onClick={() => setShowAdd(false)}>取消</Button>
             <Button onClick={handleAdd} disabled={addLoading || !addForm.name || !addForm.package_name}>
               {addLoading ? '添加中...' : '添加'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(editingApp)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingApp(null);
+            setEditingMediaId('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md max-w-[calc(100%-2rem)]">
+          <DialogHeader>
+            <DialogTitle>更新媒体ID</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">应用名称</label>
+              <div className="text-sm text-muted-foreground">{editingApp?.name}</div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">穿山甲媒体ID</label>
+              <Input
+                placeholder="如：5000546"
+                className="bg-muted border-none"
+                value={editingMediaId}
+                onChange={(e) => setEditingMediaId(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingApp(null);
+                setEditingMediaId('');
+              }}
+            >
+              取消
+            </Button>
+            <Button onClick={handleMediaIdSave} disabled={editLoading}>
+              {editLoading ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
         </DialogContent>
