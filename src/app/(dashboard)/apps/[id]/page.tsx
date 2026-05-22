@@ -52,6 +52,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [app, setApp] = useState<AppInfo | null>(null);
   const [slots, setSlots] = useState<AdSlot[]>([]);
   const [levels, setLevels] = useState<AdLevel[]>([]);
+  const [mediaId, setMediaId] = useState('');
   const [level, setLevel] = useState(4);
   const [report, setReport] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -65,6 +66,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     ]).then(([appRes, slotsRes, levelsRes]) => {
       if (appRes.data) {
         setApp(appRes.data);
+        setMediaId(appRes.data.media_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
       }
@@ -91,7 +93,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, report }),
+        body: JSON.stringify({ media_id: mediaId.trim() || null, level, report }),
       });
 
       // 更新广告位
@@ -118,6 +120,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
 
   const handleReset = () => {
     if (!app) return;
+    setMediaId(app.media_id || '');
     setLevel(app.level);
     setReport(app.report);
     // 重新获取数据
@@ -127,6 +130,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     ]).then(([appRes, slotsRes]) => {
       if (appRes.data) {
         setApp(appRes.data);
+        setMediaId(appRes.data.media_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
       }
@@ -151,7 +155,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     .filter((s) => s.enabled && levelSlotMap[s.slot_name] !== false)
     .map((s) => ({
       name: s.slot_name,
-      app_id: app?.media_id || '',
+      app_id: mediaId || '',
       val: s.ad_slot_id || '',
     }));
 
@@ -201,7 +205,12 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           </div>
           <div>
             <label className="text-xs text-muted-foreground">穿山甲媒体ID</label>
-            <div className="text-sm font-mono text-foreground mt-1">{app.media_id || '-'}</div>
+            <Input
+              className="mt-1 bg-muted border-none font-mono text-sm"
+              placeholder="后续可补充媒体ID"
+              value={mediaId}
+              onChange={(e) => setMediaId(e.target.value)}
+            />
           </div>
           <div>
             <label className="text-xs text-muted-foreground">当前Level</label>
