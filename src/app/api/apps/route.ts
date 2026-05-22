@@ -5,6 +5,8 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const search = searchParams.get('search');
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
 
   const client = getSupabaseClient();
 
@@ -12,6 +14,10 @@ export async function GET(request: NextRequest) {
     .from('apps')
     .select('id, name, package_name, media_id, level, report, status, created_at, updated_at')
     .order('created_at', { ascending: false });
+
+  if (userRole !== 'admin') {
+    query = query.eq('owner_user_id', userId || '');
+  }
 
   if (search) {
     query = query.ilike('package_name', `%${search}%`);
@@ -52,8 +58,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { name, package_name, media_id, level, report } = body;
+  const userId = request.headers.get('x-user-id');
 
-  if (!name || !package_name) {
+  if (!name || !package_name || !userId) {
     return NextResponse.json({ error: '应用名称和包名为必填项' }, { status: 400 });
   }
 
@@ -67,6 +74,7 @@ export async function POST(request: NextRequest) {
       media_id: media_id || null,
       level: level ?? 4,
       report: report ?? true,
+      owner_user_id: userId,
       status: 'active',
     })
     .select()

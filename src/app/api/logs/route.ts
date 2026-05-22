@@ -3,6 +3,11 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
 
 // GET /api/logs?page=1&pageSize=20&app_id=&code=&startDate=&endDate=
 export async function GET(request: NextRequest) {
+  const userRole = request.headers.get('x-user-role');
+  if (userRole !== 'admin') {
+    return NextResponse.json({ error: '仅管理员可访问' }, { status: 403 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '20', 10)));

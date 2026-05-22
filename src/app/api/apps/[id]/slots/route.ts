@@ -1,13 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 
+async function ensureAppAccess(appId: string, userId: string | null, userRole: string | null) {
+  const client = getSupabaseClient();
+  let query = client
+    .from('apps')
+    .select('id')
+    .eq('id', appId);
+
+  if (userRole !== 'admin') {
+    query = query.eq('owner_user_id', userId || '');
+  }
+
+  const { data, error } = await query.maybeSingle();
+  return { exists: Boolean(data), error };
+}
+
 // GET /api/apps/[id]/slots - 获取应用广告位配置
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
   const client = getSupabaseClient();
+
+  const accessResult = await ensureAppAccess(id, userId, userRole);
+  if (accessResult.error) {
+    return NextResponse.json({ error: accessResult.error.message }, { status: 500 });
+  }
+  if (!accessResult.exists) {
+    return NextResponse.json({ error: '应用不存在' }, { status: 404 });
+  }
 
   const { data, error } = await client
     .from('ad_slots')
@@ -28,6 +53,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const userId = request.headers.get('x-user-id');
+  const userRole = request.headers.get('x-user-role');
   const body = await request.json();
   const { slots } = body as { slots: Array<{ id: string; ad_slot_id?: string; platform?: number; enabled?: boolean }> };
 
@@ -36,6 +63,14 @@ export async function PUT(
   }
 
   const client = getSupabaseClient();
+
+  const accessResult = await ensureAppAccess(id, userId, userRole);
+  if (accessResult.error) {
+    return NextResponse.json({ error: accessResult.error.message }, { status: 500 });
+  }
+  if (!accessResult.exists) {
+    return NextResponse.json({ error: '应用不存在' }, { status: 404 });
+  }
 
   const results = await Promise.all(
     slots.map(async (slot) => {

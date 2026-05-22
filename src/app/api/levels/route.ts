@@ -19,6 +19,10 @@ export async function GET() {
 
 // POST /api/levels - 添加等级
 export async function POST(request: NextRequest) {
+  if (request.headers.get('x-user-role') !== 'admin') {
+    return NextResponse.json({ error: '仅管理员可访问' }, { status: 403 });
+  }
+
   const body = await request.json();
   const { name, description, level, is_default, open_screen, banner, incentive_video, insert_full_screen } = body as {
     name: string;
@@ -91,6 +95,10 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/levels - 批量更新等级配置
 export async function PUT(request: NextRequest) {
+  if (request.headers.get('x-user-role') !== 'admin') {
+    return NextResponse.json({ error: '仅管理员可访问' }, { status: 403 });
+  }
+
   const body = await request.json();
   const { levels } = body as {
     levels: Array<{
@@ -148,6 +156,10 @@ export async function PUT(request: NextRequest) {
 
 // DELETE /api/levels - 删除等级
 export async function DELETE(request: NextRequest) {
+  if (request.headers.get('x-user-role') !== 'admin') {
+    return NextResponse.json({ error: '仅管理员可访问' }, { status: 403 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 

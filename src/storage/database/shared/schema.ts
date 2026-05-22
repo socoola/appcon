@@ -8,6 +8,7 @@
 // media_id: varchar(64)
 // level: integer NOT NULL DEFAULT 4
 // report: boolean NOT NULL DEFAULT true
+// owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()
 // updated_at: timestamptz
@@ -19,6 +20,7 @@ export interface App {
   media_id: string | null;
   level: number;
   report: boolean;
+  owner_user_id: string;
   status: string;
   created_at: string;
   updated_at: string | null;
