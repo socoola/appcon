@@ -40,9 +40,11 @@ src/
 
 ## 数据库表
 
-- **apps**: 应用表（name, package_name, media_id, level, status）
+- **apps**: 应用表（name, package_name, media_id, account, external_app_id, level, status, report, owner_user_id）
 - **ad_slots**: 广告位表（app_id, slot_name, slot_label, ad_slot_id, platform, enabled）
 - **ad_levels**: 等级配置表（level, name, description, is_default, open_screen, banner, incentive_video, insert_full_screen）
+- **ad_config_logs**: 请求日志表（request_id, app_id, channel, nonce, response_code, response_msg, level, slot_count, ip, user_agent, latency_ms, created_at）
+- **users**: 用户表（username, display_name, password_hash, role, status, last_login_at）
 
 ## 构建和测试命令
 
@@ -57,16 +59,27 @@ src/
 |------|------|------|
 | `/api/san/ad-config?app_id=xxx` | GET | 兼容参考接口，返回广告配置 |
 | `/api/ad-config?app_id=xxx` | GET | 广告配置（同上） |
-| `/api/apps` | GET | 获取应用列表 |
-| `/api/apps` | POST | 创建应用 |
+| `/api/apps` | GET | 获取应用列表（含广告位统计） |
+| `/api/apps` | POST | 创建应用（参数：name, package_name, media_id, account, external_app_id, level, report） |
 | `/api/apps/[id]` | GET | 获取应用详情 |
-| `/api/apps/[id]` | PATCH | 更新应用 |
+| `/api/apps/[id]` | PUT | 更新应用（参数：media_id, account, external_app_id, level, report, status） |
 | `/api/apps/[id]` | DELETE | 删除应用 |
 | `/api/apps/[id]/slots` | GET | 获取广告位列表 |
 | `/api/apps/[id]/slots` | PUT | 批量更新广告位 |
 | `/api/levels` | GET | 获取等级列表 |
+| `/api/levels` | POST | 添加等级 |
 | `/api/levels` | PUT | 批量更新等级 |
+| `/api/levels` | DELETE | 删除等级 |
 | `/api/stats` | GET | 获取统计数据 |
+| `/api/logs` | GET | 获取请求日志（分页，含24h统计） |
+| `/api/version` | GET | 获取当前版本号（git commit hash） |
+| `/api/auth/login` | POST | 登录（username, password） |
+| `/api/auth/logout` | POST | 退出登录 |
+| `/api/auth/me` | GET | 获取当前用户信息 |
+| `/api/users` | GET | 获取用户列表（仅管理员） |
+| `/api/users` | POST | 创建用户（仅管理员） |
+| `/api/users/[id]` | PATCH | 更新用户（仅管理员） |
+| `/api/users/[id]` | DELETE | 删除用户（仅管理员） |
 
 ## 编码规范
 
