@@ -19,6 +19,8 @@ interface AppItem {
   name: string;
   package_name: string;
   media_id: string | null;
+  account: string | null;
+  external_app_id: string | null;
   level: number;
   status: string;
   total_slots: number;
@@ -42,7 +44,7 @@ export default function AppsPage() {
   const [levels, setLevels] = useState<AdLevel[]>([]);
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', package_name: '', media_id: '' });
+  const [addForm, setAddForm] = useState({ name: '', package_name: '', media_id: '', account: '', external_app_id: '' });
   const [addLoading, setAddLoading] = useState(false);
   const [editingApp, setEditingApp] = useState<AppItem | null>(null);
   const [editingMediaId, setEditingMediaId] = useState('');
@@ -88,7 +90,7 @@ export default function AppsPage() {
       });
       if (res.ok) {
         setShowAdd(false);
-        setAddForm({ name: '', package_name: '', media_id: '' });
+        setAddForm({ name: '', package_name: '', media_id: '', account: '', external_app_id: '' });
         fetchApps();
       } else {
         const json = await res.json();
@@ -172,6 +174,8 @@ export default function AppsPage() {
               <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">广告位</th>
               <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">当前Level</th>
               <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">穿山甲媒体ID</th>
+              <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">账号</th>
+              <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">App ID</th>
               <th className="text-left px-5 py-3 text-sm font-medium text-muted-foreground">状态</th>
               <th className="text-right px-5 py-3 text-sm font-medium text-muted-foreground">操作</th>
             </tr>
@@ -179,7 +183,7 @@ export default function AppsPage() {
           <tbody>
             {apps.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-12 text-muted-foreground">
+                <td colSpan={9} className="text-center py-12 text-muted-foreground">
                   {search ? '未找到匹配的应用' : '暂无应用，点击上方按钮添加'}
                 </td>
               </tr>
@@ -210,6 +214,8 @@ export default function AppsPage() {
                       </Button>
                     </div>
                   </td>
+                  <td className="px-5 py-3.5 text-sm text-muted-foreground font-mono">{app.account || '-'}</td>
+                  <td className="px-5 py-3.5 text-sm text-muted-foreground font-mono">{app.external_app_id || '-'}</td>
                   <td className="px-5 py-3.5">
                     {app.enabled_slots === app.total_slots && app.total_slots > 0 ? (
                       <Badge className="bg-success/10 text-success border-none hover:bg-success/10">已配置</Badge>
@@ -267,9 +273,19 @@ export default function AppsPage() {
                 <span>广告位 <span className="text-primary font-medium">{app.enabled_slots}</span>/{app.total_slots}</span>
                 <span>Level {app.level} {getLevelName(app.level)}</span>
               </div>
-              <div className="text-xs text-muted-foreground font-mono mb-3">
+              <div className="text-xs text-muted-foreground font-mono mb-1">
                 媒体ID：{app.media_id || '-'}
               </div>
+              {app.account && (
+                <div className="text-xs text-muted-foreground font-mono mb-1">
+                  账号：{app.account}
+                </div>
+              )}
+              {app.external_app_id && (
+                <div className="text-xs text-muted-foreground font-mono mb-3">
+                  App ID：{app.external_app_id}
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -330,6 +346,24 @@ export default function AppsPage() {
                 className="bg-muted border-none"
                 value={addForm.media_id}
                 onChange={(e) => setAddForm({ ...addForm, media_id: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">账号</label>
+              <Input
+                placeholder="可选"
+                className="bg-muted border-none"
+                value={addForm.account}
+                onChange={(e) => setAddForm({ ...addForm, account: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">App ID</label>
+              <Input
+                placeholder="可选"
+                className="bg-muted border-none"
+                value={addForm.external_app_id}
+                onChange={(e) => setAddForm({ ...addForm, external_app_id: e.target.value })}
               />
             </div>
           </div>

@@ -6,6 +6,8 @@
 // name: varchar(128) NOT NULL
 // package_name: varchar(255) NOT NULL UNIQUE
 // media_id: varchar(64)
+// account: varchar(128)
+// external_app_id: varchar(128)
 // level: integer NOT NULL DEFAULT 4
 // report: boolean NOT NULL DEFAULT true
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
@@ -18,6 +20,8 @@ export interface App {
   name: string;
   package_name: string;
   media_id: string | null;
+  account: string | null;
+  external_app_id: string | null;
   level: number;
   report: boolean;
   owner_user_id: string;
