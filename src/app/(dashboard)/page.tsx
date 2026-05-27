@@ -32,6 +32,7 @@ const slotColorMap: Record<string, string> = {
 export default function HomePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [user, setUser] = useState<AuthInfo | null>(null);
+  const [version, setVersion] = useState<string>('');
 
   useEffect(() => {
     fetch('/api/auth/me', { credentials: 'include' })
@@ -45,6 +46,11 @@ export default function HomePage() {
         return res.json();
       })
       .then((res) => { if (res) setStats(res.data); })
+      .catch(() => {});
+
+    fetch('/api/version', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => { if (res?.commit) setVersion(res.commit); })
       .catch(() => {});
   }, []);
 
@@ -194,6 +200,20 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* 版本信息 */}
+      {version && (
+        <div className="flex justify-end">
+          <a
+            href={`https://github.com/socoola/appcon/commit/${version}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            版本 {version}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
