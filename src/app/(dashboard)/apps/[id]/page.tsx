@@ -21,6 +21,8 @@ interface AppInfo {
   name: string;
   package_name: string;
   media_id: string | null;
+  account: string | null;
+  external_app_id: string | null;
   level: number;
   report: boolean;
 }
@@ -53,6 +55,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [slots, setSlots] = useState<AdSlot[]>([]);
   const [levels, setLevels] = useState<AdLevel[]>([]);
   const [mediaId, setMediaId] = useState('');
+  const [account, setAccount] = useState('');
+  const [externalAppId, setExternalAppId] = useState('');
   const [level, setLevel] = useState(4);
   const [report, setReport] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -67,6 +71,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       if (appRes.data) {
         setApp(appRes.data);
         setMediaId(appRes.data.media_id || '');
+        setAccount(appRes.data.account || '');
+        setExternalAppId(appRes.data.external_app_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
       }
@@ -93,7 +99,13 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ media_id: mediaId.trim() || null, level, report }),
+        body: JSON.stringify({
+          media_id: mediaId.trim() || null,
+          account: account.trim() || null,
+          external_app_id: externalAppId.trim() || null,
+          level,
+          report,
+        }),
       });
 
       // 更新广告位
@@ -121,6 +133,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const handleReset = () => {
     if (!app) return;
     setMediaId(app.media_id || '');
+    setAccount(app.account || '');
+    setExternalAppId(app.external_app_id || '');
     setLevel(app.level);
     setReport(app.report);
     // 重新获取数据
@@ -131,6 +145,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       if (appRes.data) {
         setApp(appRes.data);
         setMediaId(appRes.data.media_id || '');
+        setAccount(appRes.data.account || '');
+        setExternalAppId(appRes.data.external_app_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
       }
@@ -194,7 +210,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       {/* 基本信息卡片 */}
       <Card className="p-5 shadow-card border-none">
         <h2 className="text-base font-semibold text-foreground mb-4">基本信息</h2>
-        <div className="grid grid-cols-5 gap-6">
+        <div className="grid grid-cols-7 gap-6">
           <div>
             <label className="text-xs text-muted-foreground">应用名称</label>
             <div className="text-sm font-medium text-foreground mt-1">{app.name}</div>
@@ -210,6 +226,24 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
               placeholder="后续可补充媒体ID"
               value={mediaId}
               onChange={(e) => setMediaId(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">账号</label>
+            <Input
+              className="mt-1 bg-muted border-none font-mono text-sm"
+              placeholder="可选"
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">App ID</label>
+            <Input
+              className="mt-1 bg-muted border-none font-mono text-sm"
+              placeholder="可选"
+              value={externalAppId}
+              onChange={(e) => setExternalAppId(e.target.value)}
             />
           </div>
           <div>
