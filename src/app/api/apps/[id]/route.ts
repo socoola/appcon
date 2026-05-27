@@ -36,7 +36,7 @@ export async function GET(
 
   const { data: app, error: appError } = await client
     .from('apps')
-    .select('id, name, package_name, media_id, level, report, status, created_at, updated_at')
+    .select('id, name, package_name, media_id, account, external_app_id, level, report, status, created_at, updated_at')
     .eq('id', id)
     .maybeSingle();
 
@@ -74,6 +74,8 @@ export async function PUT(
   if (body.name !== undefined) updateData.name = body.name;
   if (body.package_name !== undefined) updateData.package_name = body.package_name;
   if (body.media_id !== undefined) updateData.media_id = body.media_id;
+  if (body.account !== undefined) updateData.account = body.account;
+  if (body.external_app_id !== undefined) updateData.external_app_id = body.external_app_id;
   if (body.level !== undefined) updateData.level = body.level;
   if (body.report !== undefined) updateData.report = body.report;
   if (body.status !== undefined) updateData.status = body.status;

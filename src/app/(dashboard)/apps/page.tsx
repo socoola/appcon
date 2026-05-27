@@ -47,7 +47,7 @@ export default function AppsPage() {
   const [addForm, setAddForm] = useState({ name: '', package_name: '', media_id: '', account: '', external_app_id: '' });
   const [addLoading, setAddLoading] = useState(false);
   const [editingApp, setEditingApp] = useState<AppItem | null>(null);
-  const [editingMediaId, setEditingMediaId] = useState('');
+  const [editForm, setEditForm] = useState({ media_id: '', account: '', external_app_id: '' });
   const [editLoading, setEditLoading] = useState(false);
 
   const fetchApps = useCallback(async () => {
@@ -109,12 +109,16 @@ export default function AppsPage() {
     }
   };
 
-  const openMediaIdEditor = (app: AppItem) => {
+  const openEditor = (app: AppItem) => {
     setEditingApp(app);
-    setEditingMediaId(app.media_id || '');
+    setEditForm({
+      media_id: app.media_id || '',
+      account: app.account || '',
+      external_app_id: app.external_app_id || '',
+    });
   };
 
-  const handleMediaIdSave = async () => {
+  const handleEditSave = async () => {
     if (!editingApp) return;
 
     setEditLoading(true);
@@ -123,12 +127,16 @@ export default function AppsPage() {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ media_id: editingMediaId.trim() || null }),
+        body: JSON.stringify({
+          media_id: editForm.media_id.trim() || null,
+          account: editForm.account.trim() || null,
+          external_app_id: editForm.external_app_id.trim() || null,
+        }),
       });
 
       if (res.ok) {
         setEditingApp(null);
-        setEditingMediaId('');
+        setEditForm({ media_id: '', account: '', external_app_id: '' });
         fetchApps();
       } else {
         const json = await res.json();
@@ -208,7 +216,7 @@ export default function AppsPage() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-muted-foreground"
-                        onClick={() => openMediaIdEditor(app)}
+                        onClick={() => openEditor(app)}
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
@@ -291,9 +299,9 @@ export default function AppsPage() {
                   variant="outline"
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => openMediaIdEditor(app)}
+                  onClick={() => openEditor(app)}
                 >
-                  <Pencil className="w-3.5 h-3.5" /> 媒体ID
+                  <Pencil className="w-3.5 h-3.5" /> 编辑
                 </Button>
                 <Link href={`/apps/${app.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full gap-1.5">
@@ -381,13 +389,13 @@ export default function AppsPage() {
         onOpenChange={(open) => {
           if (!open) {
             setEditingApp(null);
-            setEditingMediaId('');
+            setEditForm({ media_id: '', account: '', external_app_id: '' });
           }
         }}
       >
         <DialogContent className="sm:max-w-md max-w-[calc(100%-2rem)]">
           <DialogHeader>
-            <DialogTitle>更新媒体ID</DialogTitle>
+            <DialogTitle>编辑应用信息</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
@@ -399,8 +407,26 @@ export default function AppsPage() {
               <Input
                 placeholder="如：5000546"
                 className="bg-muted border-none"
-                value={editingMediaId}
-                onChange={(e) => setEditingMediaId(e.target.value)}
+                value={editForm.media_id}
+                onChange={(e) => setEditForm({ ...editForm, media_id: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">账号</label>
+              <Input
+                placeholder="可选"
+                className="bg-muted border-none"
+                value={editForm.account}
+                onChange={(e) => setEditForm({ ...editForm, account: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">App ID</label>
+              <Input
+                placeholder="可选"
+                className="bg-muted border-none"
+                value={editForm.external_app_id}
+                onChange={(e) => setEditForm({ ...editForm, external_app_id: e.target.value })}
               />
             </div>
           </div>
@@ -409,12 +435,12 @@ export default function AppsPage() {
               variant="outline"
               onClick={() => {
                 setEditingApp(null);
-                setEditingMediaId('');
+                setEditForm({ media_id: '', account: '', external_app_id: '' });
               }}
             >
               取消
             </Button>
-            <Button onClick={handleMediaIdSave} disabled={editLoading}>
+            <Button onClick={handleEditSave} disabled={editLoading}>
               {editLoading ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
