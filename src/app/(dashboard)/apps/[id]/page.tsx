@@ -210,7 +210,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       {/* 基本信息卡片 */}
       <Card className="p-5 shadow-card border-none">
         <h2 className="text-base font-semibold text-foreground mb-4">基本信息</h2>
-        <div className="grid grid-cols-7 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 lg:gap-6">
           <div>
             <label className="text-xs text-muted-foreground">应用名称</label>
             <div className="text-sm font-medium text-foreground mt-1">{app.name}</div>
@@ -287,7 +287,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         <h2 className="text-base font-semibold text-foreground mb-4">广告位配置</h2>
         <div className="space-y-0">
           {/* 表头 */}
-          <div className="grid grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b border-outline-variant/20">
+          <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b border-outline-variant/20">
             <div className="col-span-3">广告位类型</div>
             <div className="col-span-3">广告位ID</div>
             <div className="col-span-2">平台</div>
@@ -301,18 +301,18 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             return (
               <div
                 key={slot.id}
-                className={`grid grid-cols-12 gap-4 px-4 py-3.5 items-center border-b border-outline-variant/10 transition-colors ${
+                className={`grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 px-4 py-3.5 items-start sm:items-center border-b border-outline-variant/10 transition-colors ${
                   levelDisabled ? 'bg-muted/50 opacity-60' : 'hover:bg-muted/30'
                 }`}
               >
-                <div className="col-span-3">
+                <div className="sm:col-span-3 flex items-center justify-between sm:justify-start">
                   <span className="text-sm font-medium text-foreground">{slot.slot_label}</span>
                   <span className="text-xs text-muted-foreground ml-2 font-mono">{slot.slot_name}</span>
                   {levelDisabled && (
                     <Badge className="ml-2 bg-warning/10 text-warning border-none hover:bg-warning/10 text-xs">当前Level下关闭</Badge>
                   )}
                 </div>
-                <div className="col-span-3">
+                <div className="sm:col-span-3">
                   <Input
                     className="bg-muted border-none font-mono text-sm"
                     placeholder="输入广告位ID"
@@ -321,7 +321,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
                     disabled={levelDisabled}
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <Select
                     value={String(slot.platform)}
                     onValueChange={(v) => handleSlotChange(slot.id, 'platform', Number(v))}
@@ -337,7 +337,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   {slot.enabled && !levelDisabled ? (
                     <Badge className="bg-success/10 text-success border-none hover:bg-success/10">已启用</Badge>
                   ) : levelDisabled ? (
@@ -346,7 +346,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
                     <Badge className="bg-muted text-muted-foreground border-none hover:bg-muted">已禁用</Badge>
                   )}
                 </div>
-                <div className="col-span-2 flex justify-end">
+                <div className="sm:col-span-2 flex justify-end">
                   <Switch
                     checked={slot.enabled}
                     onCheckedChange={(v) => handleSlotChange(slot.id, 'enabled', v)}
