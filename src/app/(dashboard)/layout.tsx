@@ -11,6 +11,7 @@ import {
   Users,
   LogOut,
   Menu,
+  BookOpen,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -34,6 +35,7 @@ const navItems = [
   { href: '/levels', label: '等级管理', icon: Layers, adminOnly: true },
   { href: '/logs', label: '请求日志', icon: ScrollText, adminOnly: true },
   { href: '/users', label: '用户管理', icon: Users, adminOnly: true },
+  { href: '/docs', label: '开发手册', icon: BookOpen },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
