@@ -78,8 +78,6 @@ export default function AppsPage() {
     return found?.description || '';
   };
 
-  const stripWhitespace = (s: string) => s.replaceAll(' ', '').replaceAll('\t', '').replaceAll('\n', '').replaceAll('\r', '');
-
   const handleAdd = async () => {
     if (!addForm.name || !addForm.package_name) return;
     setAddLoading(true);
@@ -346,7 +344,7 @@ export default function AppsPage() {
                 placeholder="如：com.san.video"
                 className="bg-muted border-none"
                 value={addForm.package_name}
-                onChange={(e) => setAddForm({ ...addForm, package_name: stripWhitespace(e.target.value) })
+                onChange={(e) => setAddForm({ ...addForm, package_name: e.target.value })}
               />
             </div>
             <div className="space-y-1.5">
