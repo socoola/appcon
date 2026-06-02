@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
 // POST /api/apps - 创建应用
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, package_name, media_id, account, external_app_id, level, report } = body;
+  const { name, package_name: rawPackageName, media_id, account, external_app_id, level, report } = body;
+  const package_name = rawPackageName?.replace(/\s/g, '');
   const userId = request.headers.get('x-user-id');
 
   if (!name || !package_name || !userId) {
