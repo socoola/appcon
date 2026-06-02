@@ -78,7 +78,7 @@ export default function AppsPage() {
     return found?.description || '';
   };
 
-  const stripWhitespace = (s: string) => s.replace(/\s/g, '');
+  const stripWhitespace = (s: string) => s.replaceAll(' ', '').replaceAll('\t', '').replaceAll('\n', '').replaceAll('\r', '');
 
   const handleAdd = async () => {
     if (!addForm.name || !addForm.package_name) return;
