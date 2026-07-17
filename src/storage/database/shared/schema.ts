@@ -12,6 +12,10 @@
 // report: boolean NOT NULL DEFAULT true
 // report_url: text NOT NULL DEFAULT ''   -- V2 上报地址
 // splash_url: text NOT NULL DEFAULT ''   -- V2 启动页地址
+// popup_url_1: text NOT NULL DEFAULT ''  -- 弹框地址1
+// popup_url_2: text NOT NULL DEFAULT ''  -- 弹框地址2
+// popup_url_3: text NOT NULL DEFAULT ''  -- 弹框地址3
+// ad_order: integer NOT NULL DEFAULT 123 -- 广告排序
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()
@@ -28,6 +32,10 @@ export interface App {
   report: boolean;
   report_url: string;
   splash_url: string;
+  popup_url_1: string;
+  popup_url_2: string;
+  popup_url_3: string;
+  ad_order: number;
   owner_user_id: string;
   status: string;
   created_at: string;
