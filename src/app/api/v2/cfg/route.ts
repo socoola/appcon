@@ -7,17 +7,25 @@ import {
   validateAuthParams,
 } from '@/lib/ad-config-core';
 
-// 兼容参考接口：/api/ad-config?app_id=com.san.test&channel=apple&timestamp=xxx&nonce=xxx
-// 原参考路径 /api/san/ad-config 因路由兼容问题调整为此路径
-// 业务/鉴权逻辑见 @/lib/ad-config-core，与 V2 (/api/v2/cfg) 共用
+// V2 广告配置接口：/api/v2/cfg?app_id=com.san.test
+// 与 V1 的差异：鉴权/元数据参数改为 HTTP Header 传递
+//   - X-Timestamp: 毫秒时间戳（必填）
+//   - X-Nonce:     随机串（必填）
+//   - X-Channel:   渠道（选填）
+// 业务参数 app_id 仍走 query。鉴权逻辑与 V1 一致。
+// 返回结构与 V1 的差异：
+//   - report:     返回上报地址字符串(apps.report_url)，而非 V1 的 0/1
+//   - splash_url: 新增启动页地址(apps.splash_url)，默认 ""
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
   const searchParams = request.nextUrl.searchParams;
   const appId = searchParams.get('app_id') || '';
-  const channel = searchParams.get('channel');
-  const timestamp = searchParams.get('timestamp');
-  const nonce = searchParams.get('nonce');
+
+  // 鉴权/元数据参数从 Header 读取（V2 差异点）
+  const channel = request.headers.get('x-channel');
+  const timestamp = request.headers.get('x-timestamp');
+  const nonce = request.headers.get('x-nonce');
 
   const { ip, userAgent } = extractClientMeta(request);
 
@@ -36,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ request_id: requestId, code: 40001, msg: '缺少app_id参数', data: null });
   }
 
-  // timestamp / nonce 校验（与 V2 共用）
+  // timestamp / nonce 校验（与 V1 共用，只是来源改为 Header）
   const authError = validateAuthParams({ timestamp, nonce });
   if (authError) {
     const requestId = crypto.randomUUID();
@@ -75,11 +83,12 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     request_id: requestId,
     code: 10000,
-    // V1 保持原有结构：仅 list / level / report(0/1)，不含 V2 新增字段
+    // V2 差异：report 返回上报地址字符串，并新增 splash_url(启动页地址，默认 "")
     data: {
       list: configResult.data.list,
       level: configResult.data.level,
-      report: configResult.data.report,
+      report: configResult.data.report_url,
+      splash_url: configResult.data.splash_url,
     },
     msg: 'APP广告配置获取成功',
   });

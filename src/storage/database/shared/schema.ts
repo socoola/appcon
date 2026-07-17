@@ -10,6 +10,8 @@
 // external_app_id: varchar(128)
 // level: integer NOT NULL DEFAULT 4
 // report: boolean NOT NULL DEFAULT true
+// report_url: text NOT NULL DEFAULT ''   -- V2 上报地址
+// splash_url: text NOT NULL DEFAULT ''   -- V2 启动页地址
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()
@@ -24,6 +26,8 @@ export interface App {
   external_app_id: string | null;
   level: number;
   report: boolean;
+  report_url: string;
+  splash_url: string;
   owner_user_id: string;
   status: string;
   created_at: string;
