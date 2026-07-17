@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   let query = client
     .from('apps')
-    .select('id, name, package_name, media_id, account, external_app_id, level, report, status, created_at, updated_at')
+    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, status, created_at, updated_at')
     .order('created_at', { ascending: false });
 
   if (userRole !== 'admin') {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
   // 为每个应用获取广告位数量
   const appsWithSlots = await Promise.all(
-    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; account: string | null; external_app_id: string | null; level: number; report: boolean; status: string; created_at: string; updated_at: string | null }) => {
+    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; account: string | null; external_app_id: string | null; level: number; report: boolean; report_url: string; splash_url: string; status: string; created_at: string; updated_at: string | null }) => {
       const { count: totalSlots } = await client
         .from('ad_slots')
         .select('*', { count: 'exact', head: true })
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 // POST /api/apps - 创建应用
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, package_name: rawPackageName, media_id, account, external_app_id, level, report } = body;
+  const { name, package_name: rawPackageName, media_id, account, external_app_id, level, report, report_url, splash_url } = body;
   const package_name = rawPackageName?.replace(/\s/g, '');
   const userId = request.headers.get('x-user-id');
 
@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
       external_app_id: external_app_id || null,
       level: level ?? 4,
       report: report ?? true,
+      report_url: report_url ?? '',
+      splash_url: splash_url ?? '',
       owner_user_id: userId,
       status: 'active',
     })

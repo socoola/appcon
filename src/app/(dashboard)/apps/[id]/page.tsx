@@ -25,6 +25,8 @@ interface AppInfo {
   external_app_id: string | null;
   level: number;
   report: boolean;
+  report_url: string | null;
+  splash_url: string | null;
 }
 
 interface AdSlot {
@@ -59,6 +61,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [externalAppId, setExternalAppId] = useState('');
   const [level, setLevel] = useState(4);
   const [report, setReport] = useState(true);
+  const [reportUrl, setReportUrl] = useState('');
+  const [splashUrl, setSplashUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -75,6 +79,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setExternalAppId(appRes.data.external_app_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
+        setReportUrl(appRes.data.report_url || '');
+        setSplashUrl(appRes.data.splash_url || '');
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -105,6 +111,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           external_app_id: externalAppId.trim() || null,
           level,
           report,
+          report_url: reportUrl.trim(),
+          splash_url: splashUrl.trim(),
         }),
       });
 
@@ -137,6 +145,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     setExternalAppId(app.external_app_id || '');
     setLevel(app.level);
     setReport(app.report);
+    setReportUrl(app.report_url || '');
+    setSplashUrl(app.splash_url || '');
     // 重新获取数据
     Promise.all([
       fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
@@ -149,6 +159,8 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setExternalAppId(appRes.data.external_app_id || '');
         setLevel(appRes.data.level);
         setReport(appRes.data.report ?? true);
+        setReportUrl(appRes.data.report_url || '');
+        setSplashUrl(appRes.data.splash_url || '');
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -189,6 +201,15 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const previewTimestamp = Date.now();
   const previewNonce = 'PREVIEW_NONCE_PLACEHOLDER';
   const previewUrl = `${previewDomain}/api/san/ad-config?app_id=${app?.package_name || ''}&channel=apple&timestamp=${previewTimestamp}&nonce=${previewNonce}`;
+
+  // V2 预览：app_id 走 query，鉴权/渠道走 Header；report 为地址，新增 splash_url
+  const previewUrlV2 = `${previewDomain}/api/v2/cfg?app_id=${app?.package_name || ''}`;
+  const apiPreviewV2 = {
+    request_id: 'preview-xxx',
+    code: 10000,
+    data: { list: previewList, level, report: reportUrl, splash_url: splashUrl },
+    msg: 'APP广告配置获取成功',
+  };
 
   if (!app) {
     return <div className="text-muted-foreground">加载中...</div>;
@@ -278,6 +299,24 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
               <span className="text-sm text-foreground">{report ? '打开' : '关闭'}</span>
               <Switch checked={report} onCheckedChange={setReport} />
             </div>
+          </div>
+          <div className="sm:col-span-2 lg:col-span-3">
+            <label className="text-xs text-muted-foreground">启动页地址（V2）</label>
+            <Input
+              className="mt-1 bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={splashUrl}
+              onChange={(e) => setSplashUrl(e.target.value)}
+            />
+          </div>
+          <div className="sm:col-span-2 lg:col-span-3">
+            <label className="text-xs text-muted-foreground">上报地址（V2 report）</label>
+            <Input
+              className="mt-1 bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={reportUrl}
+              onChange={(e) => setReportUrl(e.target.value)}
+            />
           </div>
         </div>
       </Card>
@@ -400,6 +439,37 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
           {JSON.stringify(apiPreview, null, 2)}
+        </pre>
+      </Card>
+
+      {/* API预览 - V2 */}
+      <Card className="p-5 shadow-card border-none">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-base font-semibold text-foreground">API返回预览</h2>
+          <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/10">V2</Badge>
+        </div>
+        <p className="text-xs text-muted-foreground mb-2">
+          接口地址（app_id 走 query，timestamp/nonce/channel 走请求头）：
+        </p>
+        <code className="block bg-muted px-3 py-2 rounded text-foreground font-mono text-xs break-all mb-2">
+          {previewUrlV2}
+        </code>
+        <code className="block bg-muted px-3 py-2 rounded text-muted-foreground font-mono text-xs break-all mb-3">
+          X-Timestamp: {previewTimestamp}{'\n'}X-Nonce: {previewNonce}{'\n'}X-Channel: apple
+        </code>
+        <p className="text-xs text-muted-foreground mb-1">
+          与 V1 的差异：<span className="text-foreground">report</span> 返回上报地址，新增 <span className="text-foreground">splash_url</span> 启动页地址。
+        </p>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          <Badge className={reportUrl ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            report: {reportUrl || '(空)'}
+          </Badge>
+          <Badge className={splashUrl ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            splash_url: {splashUrl || '(空)'}
+          </Badge>
+        </div>
+        <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
+          {JSON.stringify(apiPreviewV2, null, 2)}
         </pre>
       </Card>
     </div>
