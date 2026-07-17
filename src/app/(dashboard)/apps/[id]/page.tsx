@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Save, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Save, RotateCcw, Play, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -65,6 +65,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [splashUrl, setSplashUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [testingV2, setTestingV2] = useState(false);
+  const [testResultV2, setTestResultV2] = useState<string | null>(null);
+  const [copiedV2, setCopiedV2] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -168,10 +171,46 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     });
   };
 
+  // 发送 V2 测试请求：用正确的 Header 打真实接口（测的是已保存的配置）
+  const handleTestV2 = async () => {
+    if (!app) return;
+    setTestingV2(true);
+    setTestResultV2(null);
+    try {
+      const res = await fetch(`/api/v2/cfg?app_id=${encodeURIComponent(app.package_name)}`, {
+        headers: {
+          'X-Timestamp': String(Date.now()),
+          'X-Nonce': crypto.randomUUID(),
+          'X-Channel': 'apple',
+        },
+      });
+      const json = await res.json();
+      setTestResultV2(JSON.stringify(json, null, 2));
+    } catch (e) {
+      setTestResultV2('请求失败：' + (e as Error).message);
+    } finally {
+      setTestingV2(false);
+    }
+  };
+
+  // 复制带 Header 的 cURL 命令，方便在终端/Postman 测试
+  const handleCopyCurlV2 = async () => {
+    if (!app) return;
+    const ts = Date.now();
+    const nonce = crypto.randomUUID();
+    const url = `${previewDomain}/api/v2/cfg?app_id=${app.package_name}`;
+    const cmd = `curl '${url}' \\\n  -H 'X-Timestamp: ${ts}' \\\n  -H 'X-Nonce: ${nonce}' \\\n  -H 'X-Channel: apple'`;
+    try {
+      await navigator.clipboard.writeText(cmd);
+      setCopiedV2(true);
+      setTimeout(() => setCopiedV2(false), 2000);
+    } catch {
+      // 剪贴板不可用时忽略
+    }
+  };
+
   // 获取当前 level 配置，用于预览过滤
   const currentLevelConfig = levels.find((l) => l.level === level);
-
-  // 生成API预览JSON - 与实际 API 返回格式一致
   const levelSlotMap: Record<string, boolean> = {
     openScreenId: currentLevelConfig?.open_screen ?? true,
     bannerId: currentLevelConfig?.banner ?? true,
@@ -471,6 +510,27 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
           {JSON.stringify(apiPreviewV2, null, 2)}
         </pre>
+
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <Button size="sm" onClick={handleTestV2} disabled={testingV2} className="gap-1.5">
+            <Play className="w-3.5 h-3.5" />
+            {testingV2 ? '请求中...' : '发送测试请求'}
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCopyCurlV2} className="gap-1.5">
+            {copiedV2 ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
+            {copiedV2 ? '已复制' : '复制 cURL'}
+          </Button>
+          <span className="text-xs text-muted-foreground">测试请求会打真实接口，返回的是已保存的配置</span>
+        </div>
+
+        {testResultV2 !== null && (
+          <div className="mt-3">
+            <p className="text-xs text-muted-foreground mb-1">接口实际返回：</p>
+            <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
+              {testResultV2}
+            </pre>
+          </div>
+        )}
       </Card>
     </div>
   );
