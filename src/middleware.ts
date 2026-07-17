@@ -7,6 +7,7 @@ const TOKEN_NAME = 'ad_config_token';
 const PUBLIC_PATHS = [
   '/api/ad-config',
   '/api/san/',
+  '/api/v2/cfg',
   '/api/auth/login',
 ];
 
