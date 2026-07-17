@@ -18,7 +18,7 @@ export default function DocsPage() {
         <div className="prose prose-sm max-w-none dark:prose-invert">
           <h2 className="text-lg font-semibold text-foreground mb-3">1. 项目概述</h2>
           <p className="text-muted-foreground">
-            App广告配置管理后台，按包名管理移动应用的广告位配置。支持穿山甲广告平台，提供0-4级广告等级控制，兼容参考接口格式 <code>/api/san/ad-config</code>。
+            App广告配置管理后台，按包名管理移动应用的广告位配置。支持穿山甲广告平台，提供0-4级广告等级控制，兼容参考接口格式 <code>/api/san/ad-config</code>。配置下发接口提供 V1（<code>/api/ad-config</code>，query 传参）与 V2（<code>/api/v2/cfg</code>，Header 传参）两个版本。
           </p>
 
           <h2 className="text-lg font-semibold text-foreground mt-6 mb-3">2. 技术栈</h2>
@@ -61,7 +61,9 @@ export default function DocsPage() {
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">account</td><td>varchar(128)</td><td>账号（可选）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">external_app_id</td><td>varchar(128)</td><td>App ID（可选）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">level</td><td>integer</td><td>广告等级 (0-4)，默认4</td></tr>
-                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">report</td><td>boolean</td><td>是否上报，默认true</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">report</td><td>boolean</td><td>是否上报，默认true（V1 返回 0/1）</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">report_url</td><td>text</td><td>上报地址，默认空串（V2 的 report 字段返回该值）</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">splash_url</td><td>text</td><td>启动页地址，默认空串（V2 返回 splash_url）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">owner_user_id</td><td>varchar(36)</td><td>所属用户</td></tr>
                 <tr><td className="py-2 font-mono">status</td><td>varchar(20)</td><td>状态，默认active</td></tr>
               </tbody>
@@ -132,7 +134,7 @@ export default function DocsPage() {
             </table>
           </div>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.2 广告配置下发接口</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.2 广告配置下发接口（V1）</h3>
           <div className="bg-muted rounded-lg p-3 mb-3">
             <p className="font-mono text-sm text-foreground">GET /api/ad-config?app_id=xxx&amp;channel=apple&amp;timestamp=xxx&amp;nonce=xxx</p>
             <p className="font-mono text-sm text-muted-foreground">GET /api/san/ad-config（兼容路径）</p>
@@ -156,6 +158,82 @@ export default function DocsPage() {
             </table>
           </div>
           <p className="text-sm text-muted-foreground mt-2">timestamp 与服务器当前时间差值需在 5 分钟内</p>
+          <p className="text-sm text-muted-foreground mt-2 mb-2">返回体：</p>
+          <pre className="bg-foreground/5 rounded-lg p-3 text-xs font-mono overflow-x-auto">
+{`{
+  "request_id": "uuid",
+  "code": 10000,
+  "msg": "APP广告配置获取成功",
+  "data": {
+    "list": [{ "name": "openScreenId", "app_id": "媒体ID", "val": "广告位ID" }],
+    "level": 3,
+    "report": 1
+  }
+}`}
+          </pre>
+
+          <h3 className="text-base font-medium text-foreground mt-6 mb-2">4.2.1 广告配置下发接口（V2）</h3>
+          <div className="bg-muted rounded-lg p-3 mb-3">
+            <p className="font-mono text-sm text-foreground">GET /api/v2/cfg?app_id=xxx</p>
+          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            与 V1 的差异：<code className="bg-muted px-1 rounded">timestamp</code> / <code className="bg-muted px-1 rounded">nonce</code> / <code className="bg-muted px-1 rounded">channel</code> 改为通过<strong>请求头</strong>传递；返回体中 <code className="bg-muted px-1 rounded">report</code> 变为上报地址字符串，并新增 <code className="bg-muted px-1 rounded">splash_url</code> 启动页地址。鉴权规则与错误码同 V1。
+          </p>
+          <p className="text-sm text-muted-foreground mb-2">查询参数：</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-outline-variant/20">
+                  <th className="text-left py-2 text-muted-foreground font-medium">参数</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">必填</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td className="py-2 font-mono">app_id</td><td>是</td><td>应用包名（走 query）</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 mb-2">请求头：</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-outline-variant/20">
+                  <th className="text-left py-2 text-muted-foreground font-medium">请求头</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">必填</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">X-Timestamp</td><td>是</td><td>时间戳（毫秒）</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">X-Nonce</td><td>是</td><td>随机字符串</td></tr>
+                <tr><td className="py-2 font-mono">X-Channel</td><td>否</td><td>渠道标识</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 mb-2">返回体：</p>
+          <pre className="bg-foreground/5 rounded-lg p-3 text-xs font-mono overflow-x-auto">
+{`{
+  "request_id": "uuid",
+  "code": 10000,
+  "msg": "APP广告配置获取成功",
+  "data": {
+    "list": [{ "name": "openScreenId", "app_id": "媒体ID", "val": "广告位ID" }],
+    "level": 3,
+    "report": "https://report.example.com/x",
+    "splash_url": ""
+  }
+}`}
+          </pre>
+          <p className="text-sm text-muted-foreground mt-2">
+            示例（cURL）：
+          </p>
+          <pre className="bg-foreground/5 rounded-lg p-3 text-xs font-mono overflow-x-auto">
+{`curl 'https://appad.coze.site/api/v2/cfg?app_id=com.san.test' \\
+  -H 'X-Timestamp: 1752600000000' \\
+  -H 'X-Nonce: abc123' \\
+  -H 'X-Channel: apple'`}
+          </pre>
 
           <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.3 应用管理接口</h3>
 
@@ -176,7 +254,9 @@ export default function DocsPage() {
   "account": "user_account",
   "external_app_id": "app_id_value",
   "level": 4,
-  "report": true
+  "report": true,
+  "report_url": "",
+  "splash_url": ""
 }`}
           </pre>
 
@@ -191,6 +271,8 @@ export default function DocsPage() {
   "external_app_id": "new_app_id",
   "level": 3,
   "report": false,
+  "report_url": "https://report.example.com/x",
+  "splash_url": "https://cdn.example.com/splash.png",
   "status": "inactive"
 }`}
           </pre>
@@ -230,7 +312,7 @@ export default function DocsPage() {
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">GET /api/logs?page=1&amp;pageSize=20&amp;app_id=xxx</p>
           </div>
-          <p className="text-sm text-muted-foreground">获取 /api/ad-config 请求日志，保留24小时</p>
+          <p className="text-sm text-muted-foreground">获取配置下发接口（V1 <code className="bg-muted px-1 rounded">/api/ad-config</code> 与 V2 <code className="bg-muted px-1 rounded">/api/v2/cfg</code>）请求日志，保留24小时</p>
 
           <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.7 版本接口</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
