@@ -68,6 +68,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [testingV2, setTestingV2] = useState(false);
   const [testResultV2, setTestResultV2] = useState<string | null>(null);
   const [copiedV2, setCopiedV2] = useState(false);
+  const [testingV1, setTestingV1] = useState(false);
+  const [testResultV1, setTestResultV1] = useState<string | null>(null);
+  const [copiedV1, setCopiedV1] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -169,6 +172,36 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setSlots(slotsRes.data);
       }
     });
+  };
+
+  // 发送 V1 测试请求：query 传参，timestamp/nonce 实时生成
+  const handleTestV1 = async () => {
+    if (!app) return;
+    setTestingV1(true);
+    setTestResultV1(null);
+    try {
+      const url = `/api/san/ad-config?app_id=${encodeURIComponent(app.package_name)}&channel=apple&timestamp=${Date.now()}&nonce=${crypto.randomUUID()}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      setTestResultV1(JSON.stringify(json, null, 2));
+    } catch (e) {
+      setTestResultV1('请求失败：' + (e as Error).message);
+    } finally {
+      setTestingV1(false);
+    }
+  };
+
+  // 复制 V1 可直接访问的链接（timestamp/nonce 实时生成）
+  const handleCopyV1 = async () => {
+    if (!app) return;
+    const url = `${previewDomain}/api/san/ad-config?app_id=${app.package_name}&channel=apple&timestamp=${Date.now()}&nonce=${crypto.randomUUID()}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedV1(true);
+      setTimeout(() => setCopiedV1(false), 2000);
+    } catch {
+      // 剪贴板不可用时忽略
+    }
   };
 
   // 发送 V2 测试请求：用正确的 Header 打真实接口（测的是已保存的配置）
@@ -479,6 +512,27 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
           {JSON.stringify(apiPreview, null, 2)}
         </pre>
+
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <Button size="sm" onClick={handleTestV1} disabled={testingV1} className="gap-1.5">
+            <Play className="w-3.5 h-3.5" />
+            {testingV1 ? '请求中...' : '发送测试请求'}
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCopyV1} className="gap-1.5">
+            {copiedV1 ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
+            {copiedV1 ? '已复制' : '复制链接'}
+          </Button>
+          <span className="text-xs text-muted-foreground">测试请求会打真实接口，返回的是已保存的配置</span>
+        </div>
+
+        {testResultV1 !== null && (
+          <div className="mt-3">
+            <p className="text-xs text-muted-foreground mb-1">接口实际返回：</p>
+            <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
+              {testResultV1}
+            </pre>
+          </div>
+        )}
       </Card>
 
       {/* API预览 - V2 */}
