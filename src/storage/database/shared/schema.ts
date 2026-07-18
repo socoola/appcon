@@ -15,7 +15,7 @@
 // popup_url_1: text NOT NULL DEFAULT ''  -- V2 弹窗地址 1
 // popup_url_2: text NOT NULL DEFAULT ''  -- V2 弹窗地址 2
 // popup_url_3: text NOT NULL DEFAULT ''  -- V2 弹窗地址 3
-// ad_order: integer NOT NULL DEFAULT 0   -- V2 广告排序/序号
+// ad_order: integer NOT NULL DEFAULT 123 -- V2 广告排序/序号
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()

@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       popup_url_1: popup_url_1 ?? '',
       popup_url_2: popup_url_2 ?? '',
       popup_url_3: popup_url_3 ?? '',
-      ad_order: ad_order ?? 0,
+      ad_order: ad_order ?? 123,
       owner_user_id: userId,
       status: 'active',
     })

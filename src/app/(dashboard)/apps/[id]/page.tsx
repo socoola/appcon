@@ -70,7 +70,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [popupUrl1, setPopupUrl1] = useState('');
   const [popupUrl2, setPopupUrl2] = useState('');
   const [popupUrl3, setPopupUrl3] = useState('');
-  const [adOrder, setAdOrder] = useState(0);
+  const [adOrder, setAdOrder] = useState(123);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [testingV2, setTestingV2] = useState(false);
@@ -542,9 +542,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             <Input
               type="number"
               className="bg-muted border-none font-mono text-sm"
-              placeholder="整数，默认 0"
+              placeholder="整数，默认 123"
               value={adOrder}
-              onChange={(e) => setAdOrder(parseInt(e.target.value, 10) || 0)}
+              onChange={(e) => setAdOrder(parseInt(e.target.value, 10) || 123)}
             />
           </div>
         </div>

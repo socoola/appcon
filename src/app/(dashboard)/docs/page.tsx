@@ -67,7 +67,7 @@ export default function DocsPage() {
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_1</td><td>text</td><td>弹窗地址 1，默认空串（V2 返回 popup_url_1）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_2</td><td>text</td><td>弹窗地址 2，默认空串（V2 返回 popup_url_2）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_3</td><td>text</td><td>弹窗地址 3，默认空串（V2 返回 popup_url_3）</td></tr>
-                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">ad_order</td><td>integer</td><td>广告排序/序号，默认 0（V2 返回 ad_order）</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">ad_order</td><td>integer</td><td>广告排序/序号，默认 123（V2 返回 ad_order）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">owner_user_id</td><td>varchar(36)</td><td>所属用户</td></tr>
                 <tr><td className="py-2 font-mono">status</td><td>varchar(20)</td><td>状态，默认active</td></tr>
               </tbody>
@@ -229,7 +229,7 @@ export default function DocsPage() {
     "popup_url_1": "",
     "popup_url_2": "",
     "popup_url_3": "",
-    "ad_order": 0
+    "ad_order": 123
   }
 }`}
           </pre>
@@ -268,7 +268,7 @@ export default function DocsPage() {
   "popup_url_1": "",
   "popup_url_2": "",
   "popup_url_3": "",
-  "ad_order": 0
+  "ad_order": 123
 }`}
           </pre>
 

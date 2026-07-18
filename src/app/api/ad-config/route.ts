@@ -75,16 +75,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     request_id: requestId,
     code: 10000,
+    // V1 保持原有结构：仅 list / level / report(0/1)，不含 V2 新增字段
     data: {
       list: configResult.data.list,
       level: configResult.data.level,
       report: configResult.data.report,
-      report_url: configResult.data.report_url,
-      splash_url: configResult.data.splash_url,
-      popup_url_1: configResult.data.popup_url_1,
-      popup_url_2: configResult.data.popup_url_2,
-      popup_url_3: configResult.data.popup_url_3,
-      ad_order: configResult.data.ad_order,
     },
     msg: 'APP广告配置获取成功',
   });
