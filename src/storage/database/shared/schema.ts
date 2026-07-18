@@ -12,10 +12,10 @@
 // report: boolean NOT NULL DEFAULT true
 // report_url: text NOT NULL DEFAULT ''   -- V2 上报地址
 // splash_url: text NOT NULL DEFAULT ''   -- V2 启动页地址
-// popup_url_1: text NOT NULL DEFAULT ''  -- 弹框地址1
-// popup_url_2: text NOT NULL DEFAULT ''  -- 弹框地址2
-// popup_url_3: text NOT NULL DEFAULT ''  -- 弹框地址3
-// ad_order: integer NOT NULL DEFAULT 123 -- 广告排序
+// popup_url_1: text NOT NULL DEFAULT ''  -- V2 弹窗地址 1
+// popup_url_2: text NOT NULL DEFAULT ''  -- V2 弹窗地址 2
+// popup_url_3: text NOT NULL DEFAULT ''  -- V2 弹窗地址 3
+// ad_order: integer NOT NULL DEFAULT 0   -- V2 广告排序/序号
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
 // created_at: timestamptz NOT NULL DEFAULT now()

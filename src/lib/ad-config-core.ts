@@ -64,11 +64,11 @@ type QueryError = {
 } | null;
 
 // 供 V1/V2 共用的核心数据：包含两版所需的全部字段，由各自路由裁剪响应。
-// - report:        0/1，V1 使用（由 apps.report boolean 派生）
-// - report_url:    上报地址字符串，V2 使用（apps.report_url，默认 ""）
-// - splash_url:    启动页地址字符串，V2 使用（apps.splash_url，默认 ""）
-// - popup_url_1/2/3: 弹框地址字符串，V2 使用（默认 ""）
-// - ad_order:      广告排序，V2 使用（默认 123）
+// - report:       0/1，V1 使用（由 apps.report boolean 派生）
+// - report_url:   上报地址字符串，V2 使用（apps.report_url，默认 ""）
+// - splash_url:   启动页地址字符串，V2 使用（apps.splash_url，默认 ""）
+// - popup_url_1/2/3: 弹窗地址字符串，V2 使用（apps.popup_url_1/2/3，默认 ""）
+// - ad_order:     广告排序/序号，V2 使用（apps.ad_order，默认 0）
 export type AdConfigData = {
   list: Array<{
     name: string;
@@ -357,7 +357,7 @@ export async function loadAdConfig(appId: string): Promise<AdConfigLookupResult>
       popup_url_1: app.popup_url_1 ?? '',
       popup_url_2: app.popup_url_2 ?? '',
       popup_url_3: app.popup_url_3 ?? '',
-      ad_order: app.ad_order ?? 123,
+      ad_order: app.ad_order ?? 0,
     };
 
     setCachedAdConfig(appId, data);
