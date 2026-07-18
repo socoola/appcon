@@ -27,6 +27,10 @@ interface AppInfo {
   report: boolean;
   report_url: string | null;
   splash_url: string | null;
+  popup_url_1: string | null;
+  popup_url_2: string | null;
+  popup_url_3: string | null;
+  ad_order: number;
 }
 
 interface AdSlot {
@@ -63,6 +67,10 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [report, setReport] = useState(true);
   const [reportUrl, setReportUrl] = useState('');
   const [splashUrl, setSplashUrl] = useState('');
+  const [popupUrl1, setPopupUrl1] = useState('');
+  const [popupUrl2, setPopupUrl2] = useState('');
+  const [popupUrl3, setPopupUrl3] = useState('');
+  const [adOrder, setAdOrder] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [testingV2, setTestingV2] = useState(false);
@@ -87,6 +95,10 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setReport(appRes.data.report ?? true);
         setReportUrl(appRes.data.report_url || '');
         setSplashUrl(appRes.data.splash_url || '');
+        setPopupUrl1(appRes.data.popup_url_1 || '');
+        setPopupUrl2(appRes.data.popup_url_2 || '');
+        setPopupUrl3(appRes.data.popup_url_3 || '');
+        setAdOrder(appRes.data.ad_order ?? 0);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -119,6 +131,10 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           report,
           report_url: reportUrl.trim(),
           splash_url: splashUrl.trim(),
+          popup_url_1: popupUrl1.trim(),
+          popup_url_2: popupUrl2.trim(),
+          popup_url_3: popupUrl3.trim(),
+          ad_order: Number.isFinite(adOrder) ? adOrder : 0,
         }),
       });
 
@@ -153,6 +169,10 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     setReport(app.report);
     setReportUrl(app.report_url || '');
     setSplashUrl(app.splash_url || '');
+    setPopupUrl1(app.popup_url_1 || '');
+    setPopupUrl2(app.popup_url_2 || '');
+    setPopupUrl3(app.popup_url_3 || '');
+    setAdOrder(app.ad_order ?? 0);
     // 重新获取数据
     Promise.all([
       fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
@@ -167,6 +187,10 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setReport(appRes.data.report ?? true);
         setReportUrl(appRes.data.report_url || '');
         setSplashUrl(appRes.data.splash_url || '');
+        setPopupUrl1(appRes.data.popup_url_1 || '');
+        setPopupUrl2(appRes.data.popup_url_2 || '');
+        setPopupUrl3(appRes.data.popup_url_3 || '');
+        setAdOrder(appRes.data.ad_order ?? 0);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -279,7 +303,16 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const apiPreviewV2 = {
     request_id: 'preview-xxx',
     code: 10000,
-    data: { list: previewList, level, report: reportUrl, splash_url: splashUrl },
+    data: {
+      list: previewList,
+      level,
+      report: reportUrl,
+      splash_url: splashUrl,
+      popup_url_1: popupUrl1,
+      popup_url_2: popupUrl2,
+      popup_url_3: popupUrl3,
+      ad_order: adOrder,
+    },
     msg: 'APP广告配置获取成功',
   };
 
@@ -470,6 +503,53 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         </div>
       </Card>
 
+      {/* V2 配置：弹窗地址与广告序号 */}
+      <Card className="p-5 shadow-card border-none">
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="text-base font-semibold text-foreground">V2 配置（弹窗地址与序号）</h2>
+          <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/10">V2</Badge>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">弹窗地址 1（popup_url_1）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={popupUrl1}
+              onChange={(e) => setPopupUrl1(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">弹窗地址 2（popup_url_2）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={popupUrl2}
+              onChange={(e) => setPopupUrl2(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">弹窗地址 3（popup_url_3）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={popupUrl3}
+              onChange={(e) => setPopupUrl3(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">广告序号（ad_order）</label>
+            <Input
+              type="number"
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="整数，默认 0"
+              value={adOrder}
+              onChange={(e) => setAdOrder(parseInt(e.target.value, 10) || 0)}
+            />
+          </div>
+        </div>
+      </Card>
+
       {/* 底部操作栏 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -559,6 +639,18 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           </Badge>
           <Badge className={splashUrl ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
             splash_url: {splashUrl || '(空)'}
+          </Badge>
+          <Badge className={popupUrl1 ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            popup_url_1: {popupUrl1 || '(空)'}
+          </Badge>
+          <Badge className={popupUrl2 ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            popup_url_2: {popupUrl2 || '(空)'}
+          </Badge>
+          <Badge className={popupUrl3 ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            popup_url_3: {popupUrl3 || '(空)'}
+          </Badge>
+          <Badge className={adOrder ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            ad_order: {adOrder}
           </Badge>
         </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">
