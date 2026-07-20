@@ -248,9 +248,23 @@ export default function DocsPage() {
           <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.3 应用管理接口</h3>
 
           <div className="bg-muted rounded-lg p-3 mb-2">
-            <p className="font-mono text-sm text-foreground">GET /api/apps</p>
+            <p className="font-mono text-sm text-foreground">GET /api/apps?page=1&amp;pageSize=20&amp;search=xxx</p>
           </div>
-          <p className="text-sm text-muted-foreground">获取应用列表。支持 <code className="bg-muted px-1 rounded">?search=xxx</code> 按包名搜索</p>
+          <p className="text-sm text-muted-foreground mb-2">
+            获取应用列表（分页）。<code className="bg-muted px-1 rounded">page</code> 默认 1，<code className="bg-muted px-1 rounded">pageSize</code> 默认 20（最大 100），<code className="bg-muted px-1 rounded">search</code> 按包名模糊匹配。未传参时返回第 1 页前 20 条。
+          </p>
+          <p className="text-sm text-muted-foreground mb-2">响应体：</p>
+          <pre className="bg-foreground/5 rounded-lg p-3 text-xs font-mono overflow-x-auto">
+{`{
+  "data": [ /* AppItem[]，含 total_slots / enabled_slots */ ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 43,
+    "totalPages": 3
+  }
+}`}
+          </pre>
 
           <div className="bg-muted rounded-lg p-3 mb-2 mt-3">
             <p className="font-mono text-sm text-foreground">POST /api/apps</p>
