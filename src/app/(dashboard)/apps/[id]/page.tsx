@@ -98,7 +98,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setPopupUrl1(appRes.data.popup_url_1 || '');
         setPopupUrl2(appRes.data.popup_url_2 || '');
         setPopupUrl3(appRes.data.popup_url_3 || '');
-        setAdOrder(appRes.data.ad_order ?? 0);
+        setAdOrder(appRes.data.ad_order ?? 123);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
@@ -134,7 +134,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           popup_url_1: popupUrl1.trim(),
           popup_url_2: popupUrl2.trim(),
           popup_url_3: popupUrl3.trim(),
-          ad_order: Number.isFinite(adOrder) ? adOrder : 0,
+          ad_order: Number.isFinite(adOrder) ? adOrder : 123,
         }),
       });
 
@@ -172,7 +172,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     setPopupUrl1(app.popup_url_1 || '');
     setPopupUrl2(app.popup_url_2 || '');
     setPopupUrl3(app.popup_url_3 || '');
-    setAdOrder(app.ad_order ?? 0);
+    setAdOrder(app.ad_order ?? 123);
     // 重新获取数据
     Promise.all([
       fetch(`/api/apps/${id}`, { credentials: 'include' }).then((r) => r.json()),
@@ -190,7 +190,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setPopupUrl1(appRes.data.popup_url_1 || '');
         setPopupUrl2(appRes.data.popup_url_2 || '');
         setPopupUrl3(appRes.data.popup_url_3 || '');
-        setAdOrder(appRes.data.ad_order ?? 0);
+        setAdOrder(appRes.data.ad_order ?? 123);
       }
       if (slotsRes.data) {
         setSlots(slotsRes.data);
