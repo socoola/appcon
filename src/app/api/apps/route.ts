@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 
-// GET /api/apps - 获取应用列表
+// GET /api/apps - 获取应用列表（分页）
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const search = searchParams.get('search');
+  const search = searchParams.get('search')?.trim() || '';
+
+  const rawPage = Number.parseInt(searchParams.get('page') || '1', 10);
+  const rawPageSize = Number.parseInt(searchParams.get('pageSize') || '20', 10);
+  const page = Number.isFinite(rawPage) ? Math.max(1, rawPage) : 1;
+  const pageSize = Number.isFinite(rawPageSize)
+    ? Math.min(100, Math.max(1, rawPageSize))
+    : 20;
+
   const userId = request.headers.get('x-user-id');
   const userRole = request.headers.get('x-user-role');
 
@@ -12,8 +20,10 @@ export async function GET(request: NextRequest) {
 
   let query = client
     .from('apps')
-    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order, status, created_at, updated_at')
-    .order('created_at', { ascending: false });
+    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order, status, created_at, updated_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    // 二次排序保证 created_at 相同时分页边界稳定
+    .order('id', { ascending: false });
 
   if (userRole !== 'admin') {
     query = query.eq('owner_user_id', userId || '');
@@ -23,7 +33,9 @@ export async function GET(request: NextRequest) {
     query = query.ilike('package_name', `%${search}%`);
   }
 
-  const { data, error } = await query;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  const { data, error, count } = await query.range(from, to);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -51,7 +63,17 @@ export async function GET(request: NextRequest) {
     })
   );
 
-  return NextResponse.json({ data: appsWithSlots });
+  const total = count ?? 0;
+
+  return NextResponse.json({
+    data: appsWithSlots,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    },
+  });
 }
 
 // POST /api/apps - 创建应用
