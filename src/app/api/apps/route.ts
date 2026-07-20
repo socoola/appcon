@@ -30,7 +30,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (search) {
-    query = query.ilike('package_name', `%${search}%`);
+    // 同时按应用名称和包名模糊匹配
+    const escaped = search.replace(/[%_]/g, (m) => `\\${m}`);
+    query = query.or(`name.ilike.%${escaped}%,package_name.ilike.%${escaped}%`);
   }
 
   const from = (page - 1) * pageSize;

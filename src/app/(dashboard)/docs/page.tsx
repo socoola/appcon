@@ -252,7 +252,7 @@ export default function DocsPage() {
             <p className="font-mono text-sm text-foreground">GET /api/apps?page=1&amp;pageSize=20&amp;search=xxx</p>
           </div>
           <p className="text-sm text-muted-foreground mb-2">
-            获取应用列表（分页）。<code className="bg-muted px-1 rounded">page</code> 默认 1，<code className="bg-muted px-1 rounded">pageSize</code> 默认 20（最大 100），<code className="bg-muted px-1 rounded">search</code> 按包名模糊匹配。未传参时返回第 1 页前 20 条。
+            获取应用列表（分页）。<code className="bg-muted px-1 rounded">page</code> 默认 1，<code className="bg-muted px-1 rounded">pageSize</code> 默认 20（最大 100），<code className="bg-muted px-1 rounded">search</code> 按应用名称或包名模糊匹配(OR)。未传参时返回第 1 页前 20 条。
           </p>
           <p className="text-sm text-muted-foreground mb-2">响应体：</p>
           <pre className="bg-foreground/5 rounded-lg p-3 text-xs font-mono overflow-x-auto">

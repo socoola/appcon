@@ -503,7 +503,7 @@ export default function AppsPage() {
           <div className="relative flex-1 sm:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="搜索包名..."
+              placeholder="搜索应用名称或包名..."
               className="pl-9 bg-muted border-none"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
