@@ -36,7 +36,7 @@ export async function GET(
 
   const { data: app, error: appError } = await client
     .from('apps')
-    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, ad_order, status, created_at, updated_at')
+    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order, status, created_at, updated_at')
     .eq('id', id)
     .maybeSingle();
 
@@ -83,6 +83,7 @@ export async function PUT(
   if (body.popup_url_1 !== undefined) updateData.popup_url_1 = body.popup_url_1;
   if (body.popup_url_2 !== undefined) updateData.popup_url_2 = body.popup_url_2;
   if (body.popup_url_3 !== undefined) updateData.popup_url_3 = body.popup_url_3;
+  if (body.popup_url_4 !== undefined) updateData.popup_url_4 = body.popup_url_4;
   if (body.ad_order !== undefined) updateData.ad_order = body.ad_order;
   if (body.status !== undefined) updateData.status = body.status;
 

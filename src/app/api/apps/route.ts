@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   let query = client
     .from('apps')
-    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, ad_order, status, created_at, updated_at')
+    .select('id, name, package_name, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order, status, created_at, updated_at')
     .order('created_at', { ascending: false });
 
   if (userRole !== 'admin') {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
   // 为每个应用获取广告位数量
   const appsWithSlots = await Promise.all(
-    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; account: string | null; external_app_id: string | null; level: number; report: boolean; report_url: string; splash_url: string; popup_url_1: string; popup_url_2: string; popup_url_3: string; ad_order: number; status: string; created_at: string; updated_at: string | null }) => {
+    (data || []).map(async (app: { id: string; name: string; package_name: string; media_id: string | null; account: string | null; external_app_id: string | null; level: number; report: boolean; report_url: string; splash_url: string; popup_url_1: string; popup_url_2: string; popup_url_3: string; popup_url_4: string; ad_order: number; status: string; created_at: string; updated_at: string | null }) => {
       const { count: totalSlots } = await client
         .from('ad_slots')
         .select('*', { count: 'exact', head: true })
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 // POST /api/apps - 创建应用
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, package_name: rawPackageName, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, ad_order } = body;
+  const { name, package_name: rawPackageName, media_id, account, external_app_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order } = body;
   const package_name = rawPackageName?.replace(/\s/g, '');
   const userId = request.headers.get('x-user-id');
 
@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
       popup_url_1: popup_url_1 ?? '',
       popup_url_2: popup_url_2 ?? '',
       popup_url_3: popup_url_3 ?? '',
+      popup_url_4: popup_url_4 ?? '',
       ad_order: ad_order ?? 123,
       owner_user_id: userId,
       status: 'active',

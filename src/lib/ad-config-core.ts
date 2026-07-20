@@ -43,6 +43,7 @@ type AppRecord = {
   popup_url_1: string | null;
   popup_url_2: string | null;
   popup_url_3: string | null;
+  popup_url_4: string | null;
   ad_order: number;
 };
 
@@ -82,6 +83,7 @@ export type AdConfigData = {
   popup_url_1: string;
   popup_url_2: string;
   popup_url_3: string;
+  popup_url_4: string;
   ad_order: number;
 };
 
@@ -259,7 +261,7 @@ export async function loadAdConfig(appId: string): Promise<AdConfigLookupResult>
       const appResult = await withTimeout(
         client
           .from('apps')
-          .select('id, media_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, ad_order')
+          .select('id, media_id, level, report, report_url, splash_url, popup_url_1, popup_url_2, popup_url_3, popup_url_4, ad_order')
           .eq('package_name', appId)
           .maybeSingle(),
         MAIN_QUERY_TIMEOUT_MS,
@@ -357,6 +359,7 @@ export async function loadAdConfig(appId: string): Promise<AdConfigLookupResult>
       popup_url_1: app.popup_url_1 ?? '',
       popup_url_2: app.popup_url_2 ?? '',
       popup_url_3: app.popup_url_3 ?? '',
+      popup_url_4: app.popup_url_4 ?? '',
       ad_order: app.ad_order ?? 0,
     };
 

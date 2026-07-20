@@ -30,6 +30,7 @@ interface AppInfo {
   popup_url_1: string | null;
   popup_url_2: string | null;
   popup_url_3: string | null;
+  popup_url_4: string | null;
   ad_order: number;
 }
 
@@ -70,6 +71,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [popupUrl1, setPopupUrl1] = useState('');
   const [popupUrl2, setPopupUrl2] = useState('');
   const [popupUrl3, setPopupUrl3] = useState('');
+  const [popupUrl4, setPopupUrl4] = useState('');
   const [adOrder, setAdOrder] = useState(123);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -98,6 +100,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setPopupUrl1(appRes.data.popup_url_1 || '');
         setPopupUrl2(appRes.data.popup_url_2 || '');
         setPopupUrl3(appRes.data.popup_url_3 || '');
+        setPopupUrl4(appRes.data.popup_url_4 || '');
         setAdOrder(appRes.data.ad_order ?? 123);
       }
       if (slotsRes.data) {
@@ -134,6 +137,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           popup_url_1: popupUrl1.trim(),
           popup_url_2: popupUrl2.trim(),
           popup_url_3: popupUrl3.trim(),
+          popup_url_4: popupUrl4.trim(),
           ad_order: Number.isFinite(adOrder) ? adOrder : 123,
         }),
       });
@@ -172,6 +176,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
     setPopupUrl1(app.popup_url_1 || '');
     setPopupUrl2(app.popup_url_2 || '');
     setPopupUrl3(app.popup_url_3 || '');
+    setPopupUrl4(app.popup_url_4 || '');
     setAdOrder(app.ad_order ?? 123);
     // 重新获取数据
     Promise.all([
@@ -190,6 +195,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         setPopupUrl1(appRes.data.popup_url_1 || '');
         setPopupUrl2(appRes.data.popup_url_2 || '');
         setPopupUrl3(appRes.data.popup_url_3 || '');
+        setPopupUrl4(appRes.data.popup_url_4 || '');
         setAdOrder(appRes.data.ad_order ?? 123);
       }
       if (slotsRes.data) {
@@ -311,6 +317,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       popup_url_1: popupUrl1,
       popup_url_2: popupUrl2,
       popup_url_3: popupUrl3,
+      popup_url_4: popupUrl4,
       ad_order: adOrder,
     },
     msg: 'APP广告配置获取成功',
@@ -538,6 +545,15 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             />
           </div>
           <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">弹窗地址 4（popup_url_4）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={popupUrl4}
+              onChange={(e) => setPopupUrl4(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
             <label className="text-xs text-muted-foreground">广告序号（ad_order）</label>
             <Input
               type="number"
@@ -648,6 +664,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           </Badge>
           <Badge className={popupUrl3 ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
             popup_url_3: {popupUrl3 || '(空)'}
+          </Badge>
+          <Badge className={popupUrl4 ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            popup_url_4: {popupUrl4 || '(空)'}
           </Badge>
           <Badge className={adOrder ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
             ad_order: {adOrder}

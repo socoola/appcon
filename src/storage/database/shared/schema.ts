@@ -15,6 +15,7 @@
 // popup_url_1: text NOT NULL DEFAULT ''  -- V2 弹窗地址 1
 // popup_url_2: text NOT NULL DEFAULT ''  -- V2 弹窗地址 2
 // popup_url_3: text NOT NULL DEFAULT ''  -- V2 弹窗地址 3
+// popup_url_4: text NOT NULL DEFAULT ''  -- V2 弹窗地址 4
 // ad_order: integer NOT NULL DEFAULT 123 -- V2 广告排序/序号
 // owner_user_id: varchar(36) NOT NULL REFERENCES users(id)
 // status: varchar(20) NOT NULL DEFAULT 'active'
@@ -35,6 +36,7 @@ export interface App {
   popup_url_1: string;
   popup_url_2: string;
   popup_url_3: string;
+  popup_url_4: string;
   ad_order: number;
   owner_user_id: string;
   status: string;

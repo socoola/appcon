@@ -67,6 +67,7 @@ export default function DocsPage() {
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_1</td><td>text</td><td>弹窗地址 1，默认空串（V2 返回 popup_url_1）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_2</td><td>text</td><td>弹窗地址 2，默认空串（V2 返回 popup_url_2）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_3</td><td>text</td><td>弹窗地址 3，默认空串（V2 返回 popup_url_3）</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">popup_url_4</td><td>text</td><td>弹窗地址 4，默认空串（V2 返回 popup_url_4）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">ad_order</td><td>integer</td><td>广告排序/序号，默认 123（V2 返回 ad_order）</td></tr>
                 <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">owner_user_id</td><td>varchar(36)</td><td>所属用户</td></tr>
                 <tr><td className="py-2 font-mono">status</td><td>varchar(20)</td><td>状态，默认active</td></tr>
@@ -181,7 +182,7 @@ export default function DocsPage() {
             <p className="font-mono text-sm text-foreground">GET /api/v2/cfg?app_id=xxx</p>
           </div>
           <p className="text-sm text-muted-foreground mb-2">
-            与 V1 的差异：<code className="bg-muted px-1 rounded">timestamp</code> / <code className="bg-muted px-1 rounded">nonce</code> / <code className="bg-muted px-1 rounded">channel</code> 改为通过<strong>请求头</strong>传递；返回体中 <code className="bg-muted px-1 rounded">report</code> 变为上报地址字符串，并新增 <code className="bg-muted px-1 rounded">splash_url</code> 启动页地址、<code className="bg-muted px-1 rounded">popup_url_1/2/3</code> 弹窗地址、<code className="bg-muted px-1 rounded">ad_order</code> 广告序号。鉴权规则与错误码同 V1。
+            与 V1 的差异：<code className="bg-muted px-1 rounded">timestamp</code> / <code className="bg-muted px-1 rounded">nonce</code> / <code className="bg-muted px-1 rounded">channel</code> 改为通过<strong>请求头</strong>传递；返回体中 <code className="bg-muted px-1 rounded">report</code> 变为上报地址字符串，并新增 <code className="bg-muted px-1 rounded">splash_url</code> 启动页地址、<code className="bg-muted px-1 rounded">popup_url_1/2/3/4</code> 弹窗地址、<code className="bg-muted px-1 rounded">ad_order</code> 广告序号。鉴权规则与错误码同 V1。
           </p>
           <p className="text-sm text-muted-foreground mb-2">查询参数：</p>
           <div className="overflow-x-auto">
@@ -229,6 +230,7 @@ export default function DocsPage() {
     "popup_url_1": "",
     "popup_url_2": "",
     "popup_url_3": "",
+    "popup_url_4": "",
     "ad_order": 123
   }
 }`}
@@ -268,6 +270,7 @@ export default function DocsPage() {
   "popup_url_1": "",
   "popup_url_2": "",
   "popup_url_3": "",
+  "popup_url_4": "",
   "ad_order": 123
 }`}
           </pre>
@@ -288,6 +291,7 @@ export default function DocsPage() {
   "popup_url_1": "https://popup.example.com/1",
   "popup_url_2": "https://popup.example.com/2",
   "popup_url_3": "https://popup.example.com/3",
+  "popup_url_4": "https://popup.example.com/4",
   "ad_order": 100,
   "status": "inactive"
 }`}

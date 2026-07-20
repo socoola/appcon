@@ -16,7 +16,7 @@ import {
 // 返回结构与 V1 的差异：
 //   - report:        返回上报地址字符串(apps.report_url)，而非 V1 的 0/1
 //   - splash_url:    新增启动页地址(apps.splash_url)，默认 ""
-//   - popup_url_1/2/3: 新增弹窗地址(apps.popup_url_1/2/3)，默认 ""
+//   - popup_url_1/2/3/4: 新增弹窗地址(apps.popup_url_1/2/3/4)，默认 ""
 //   - ad_order:      新增广告排序/序号(apps.ad_order)，默认 0
 
 export async function GET(request: NextRequest) {
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     request_id: requestId,
     code: 10000,
     // V2 差异：report 返回上报地址字符串，并新增 splash_url(启动页地址，默认 "")
-    // 此外返回 popup_url_1/2/3(弹窗地址，默认 "")与 ad_order(广告序号，默认 0)
+    // 此外返回 popup_url_1/2/3/4(弹窗地址，默认 "")与 ad_order(广告序号，默认 0)
     data: {
       list: configResult.data.list,
       level: configResult.data.level,
@@ -95,6 +95,7 @@ export async function GET(request: NextRequest) {
       popup_url_1: configResult.data.popup_url_1,
       popup_url_2: configResult.data.popup_url_2,
       popup_url_3: configResult.data.popup_url_3,
+      popup_url_4: configResult.data.popup_url_4,
       ad_order: configResult.data.ad_order,
     },
     msg: 'APP广告配置获取成功',
