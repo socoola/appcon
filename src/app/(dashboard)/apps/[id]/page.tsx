@@ -319,6 +319,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       popup_url_3: popupUrl3,
       popup_url_4: popupUrl4,
       ad_order: adOrder,
+      app_external_id: externalAppId,
     },
     msg: 'APP广告配置获取成功',
   };
@@ -670,6 +671,9 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
           </Badge>
           <Badge className={adOrder ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
             ad_order: {adOrder}
+          </Badge>
+          <Badge className={externalAppId ? 'bg-primary/10 text-primary border-none' : 'bg-muted text-muted-foreground border-none'}>
+            app_external_id: {externalAppId || '(空)'}
           </Badge>
         </div>
         <pre className="bg-foreground/5 rounded-lg p-4 text-xs font-mono text-foreground overflow-x-auto">

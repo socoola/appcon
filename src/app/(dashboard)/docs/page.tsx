@@ -182,7 +182,7 @@ export default function DocsPage() {
             <p className="font-mono text-sm text-foreground">GET /api/v2/cfg?app_id=xxx</p>
           </div>
           <p className="text-sm text-muted-foreground mb-2">
-            与 V1 的差异：<code className="bg-muted px-1 rounded">timestamp</code> / <code className="bg-muted px-1 rounded">nonce</code> / <code className="bg-muted px-1 rounded">channel</code> 改为通过<strong>请求头</strong>传递；返回体中 <code className="bg-muted px-1 rounded">report</code> 变为上报地址字符串，并新增 <code className="bg-muted px-1 rounded">splash_url</code> 启动页地址、<code className="bg-muted px-1 rounded">popup_url_1/2/3/4</code> 弹窗地址、<code className="bg-muted px-1 rounded">ad_order</code> 广告序号。鉴权规则与错误码同 V1。
+            与 V1 的差异：<code className="bg-muted px-1 rounded">timestamp</code> / <code className="bg-muted px-1 rounded">nonce</code> / <code className="bg-muted px-1 rounded">channel</code> 改为通过<strong>请求头</strong>传递；返回体中 <code className="bg-muted px-1 rounded">report</code> 变为上报地址字符串，并新增 <code className="bg-muted px-1 rounded">splash_url</code> 启动页地址、<code className="bg-muted px-1 rounded">popup_url_1/2/3/4</code> 弹窗地址、<code className="bg-muted px-1 rounded">ad_order</code> 广告序号、<code className="bg-muted px-1 rounded">app_external_id</code> 应用 App ID。鉴权规则与错误码同 V1。
           </p>
           <p className="text-sm text-muted-foreground mb-2">查询参数：</p>
           <div className="overflow-x-auto">
@@ -231,7 +231,8 @@ export default function DocsPage() {
     "popup_url_2": "",
     "popup_url_3": "",
     "popup_url_4": "",
-    "ad_order": 123
+    "ad_order": 123,
+    "app_external_id": ""
   }
 }`}
           </pre>

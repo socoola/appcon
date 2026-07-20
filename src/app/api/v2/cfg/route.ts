@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
     code: 10000,
     // V2 差异：report 返回上报地址字符串，并新增 splash_url(启动页地址，默认 "")
     // 此外返回 popup_url_1/2/3/4(弹窗地址，默认 "")与 ad_order(广告序号，默认 0)
+    // 以及 app_external_id(应用 App ID，默认 "")
     data: {
       list: configResult.data.list,
       level: configResult.data.level,
@@ -97,6 +98,7 @@ export async function GET(request: NextRequest) {
       popup_url_3: configResult.data.popup_url_3,
       popup_url_4: configResult.data.popup_url_4,
       ad_order: configResult.data.ad_order,
+      app_external_id: configResult.data.app_external_id,
     },
     msg: 'APP广告配置获取成功',
   });
