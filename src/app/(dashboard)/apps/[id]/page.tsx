@@ -412,24 +412,6 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
               <Switch checked={report} onCheckedChange={setReport} />
             </div>
           </div>
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label className="text-xs text-muted-foreground">启动页地址（V2）</label>
-            <Input
-              className="mt-1 bg-muted border-none font-mono text-sm"
-              placeholder="默认为空，如 https://..."
-              value={splashUrl}
-              onChange={(e) => setSplashUrl(e.target.value)}
-            />
-          </div>
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label className="text-xs text-muted-foreground">上报地址（V2 report）</label>
-            <Input
-              className="mt-1 bg-muted border-none font-mono text-sm"
-              placeholder="默认为空，如 https://..."
-              value={reportUrl}
-              onChange={(e) => setReportUrl(e.target.value)}
-            />
-          </div>
         </div>
       </Card>
 
@@ -510,13 +492,31 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
         </div>
       </Card>
 
-      {/* V2 配置：弹窗地址与广告序号 */}
+      {/* V2 配置 */}
       <Card className="p-5 shadow-card border-none">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-base font-semibold text-foreground">V2 配置（弹窗地址与序号）</h2>
+          <h2 className="text-base font-semibold text-foreground">V2 配置</h2>
           <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/10">V2</Badge>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">启动页地址（splash_url）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={splashUrl}
+              onChange={(e) => setSplashUrl(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">上报地址（report_url，V2 report 字段）</label>
+            <Input
+              className="bg-muted border-none font-mono text-sm"
+              placeholder="默认为空，如 https://..."
+              value={reportUrl}
+              onChange={(e) => setReportUrl(e.target.value)}
+            />
+          </div>
           <div className="space-y-1.5">
             <label className="text-xs text-muted-foreground">弹窗地址 1（popup_url_1）</label>
             <Input
