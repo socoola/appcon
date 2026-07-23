@@ -75,11 +75,12 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     request_id: requestId,
     code: 10000,
-    // V1 保持原有结构：仅 list / level / report(0/1)，不含 V2 新增字段
+    // V1 保持原有结构：list / level / report(0/1) / app_external_id
     data: {
       list: configResult.data.list,
       level: configResult.data.level,
       report: configResult.data.report,
+      app_external_id: configResult.data.app_external_id,
     },
     msg: 'APP广告配置获取成功',
   });
