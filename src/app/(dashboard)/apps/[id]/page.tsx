@@ -73,6 +73,7 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
   const [popupUrl3, setPopupUrl3] = useState('');
   const [popupUrl4, setPopupUrl4] = useState('');
   const [adOrder, setAdOrder] = useState(123);
+  const [defaultReportUrl, setDefaultReportUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [testingV2, setTestingV2] = useState(false);
@@ -111,6 +112,25 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
       }
     });
   }, [id]);
+
+  // best-effort: 拉取系统默认 report_url,失败静默
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/settings', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((json) => {
+        if (cancelled) return;
+        const items = (json?.data || []) as Array<{ key: string; value: string }>;
+        const found = items.find((s) => s.key === 'default_report_url');
+        setDefaultReportUrl(found?.value ?? '');
+      })
+      .catch(() => {
+        // 静默 — 按钮不可用即可
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSlotChange = (slotId: string, field: string, value: unknown) => {
     setSlots((prev) =>
@@ -510,7 +530,23 @@ export default function AppConfigPage({ params }: { params: Promise<{ id: string
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs text-muted-foreground">上报地址（report_url，V2 report 字段）</label>
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-xs text-muted-foreground">上报地址（report_url，V2 report 字段）</label>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                disabled={defaultReportUrl === ''}
+                title={
+                  defaultReportUrl === ''
+                    ? '系统默认值为空，请先在「系统设置」中配置'
+                    : `填入系统默认值：${defaultReportUrl}`
+                }
+                onClick={() => setReportUrl(defaultReportUrl)}
+              >
+                使用默认值
+              </Button>
+            </div>
             <Input
               className="bg-muted border-none font-mono text-sm"
               placeholder="默认为空，如 https://..."
