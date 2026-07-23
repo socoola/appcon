@@ -121,6 +121,27 @@ export default function DocsPage() {
             </table>
           </div>
 
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">3.6 system_settings（系统设置 KV）</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-outline-variant/20">
+                  <th className="text-left py-2 text-muted-foreground font-medium">字段</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">类型</th>
+                  <th className="text-left py-2 text-muted-foreground font-medium">说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">key</td><td>text</td><td>PK，设置项名</td></tr>
+                <tr className="border-b border-outline-variant/10"><td className="py-2 font-mono">value</td><td>text</td><td>设置值，默认空串</td></tr>
+                <tr><td className="py-2 font-mono">updated_at</td><td>timestamptz</td><td>更新时间</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            当前已使用的键：<code className="bg-muted px-1 rounded">default_report_url</code>（默认上报地址，应用详情页「使用默认值」按钮读取）。
+          </p>
+
           <h2 className="text-lg font-semibold text-foreground mt-6 mb-3">4. API 接口文档</h2>
 
           <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.1 认证机制</h3>
@@ -343,26 +364,33 @@ export default function DocsPage() {
             <p className="font-mono text-sm text-foreground">DELETE /api/levels?id=xxx（仅admin）</p>
           </div>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.6 日志接口</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.6 系统设置接口</h3>
+          <div className="bg-muted rounded-lg p-3 mb-2">
+            <p className="font-mono text-sm text-foreground">GET /api/settings</p>
+            <p className="font-mono text-sm text-foreground">PUT /api/settings（仅 admin，body: {`{key, value}`}）</p>
+          </div>
+          <p className="text-sm text-muted-foreground">读取或 upsert 系统级设置项。当前已使用：<code className="bg-muted px-1 rounded">default_report_url</code>（默认上报地址）。</p>
+
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.7 日志接口</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">GET /api/logs?page=1&amp;pageSize=20&amp;app_id=xxx</p>
           </div>
           <p className="text-sm text-muted-foreground">获取配置下发接口（V1 <code className="bg-muted px-1 rounded">/api/ad-config</code> 与 V2 <code className="bg-muted px-1 rounded">/api/v2/cfg</code>）请求日志，保留24小时</p>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.7 版本接口</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.8 版本接口</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">GET /api/version</p>
           </div>
           <p className="text-sm text-muted-foreground">返回当前 git commit hash</p>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.8 认证接口</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.9 认证接口</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">POST /api/auth/login</p>
             <p className="font-mono text-sm text-foreground">POST /api/auth/logout</p>
             <p className="font-mono text-sm text-foreground">GET /api/auth/me</p>
           </div>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.9 用户管理接口（仅admin）</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.10 用户管理接口（仅admin）</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">GET /api/users</p>
             <p className="font-mono text-sm text-foreground">POST /api/users</p>
@@ -370,7 +398,7 @@ export default function DocsPage() {
             <p className="font-mono text-sm text-foreground">DELETE /api/users/:id</p>
           </div>
 
-          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.10 统计接口</h3>
+          <h3 className="text-base font-medium text-foreground mt-4 mb-2">4.11 统计接口</h3>
           <div className="bg-muted rounded-lg p-3 mb-2">
             <p className="font-mono text-sm text-foreground">GET /api/stats</p>
           </div>
