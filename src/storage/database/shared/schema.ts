@@ -147,3 +147,14 @@ export interface AdLevel {
   created_at: string;
   updated_at: string | null;
 }
+
+// ===== system_settings 系统设置(KV) =====
+// key: text PK                    -- 设置项名,如 'default_report_url'
+// value: text NOT NULL DEFAULT '' -- 设置值
+// updated_at: timestamptz NOT NULL DEFAULT now()
+
+export interface SystemSetting {
+  key: string;
+  value: string;
+  updated_at: string | null;
+}
