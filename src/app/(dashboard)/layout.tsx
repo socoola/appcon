@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   BookOpen,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -35,6 +36,7 @@ const navItems = [
   { href: '/levels', label: '等级管理', icon: Layers, adminOnly: true },
   { href: '/logs', label: '请求日志', icon: ScrollText, adminOnly: true },
   { href: '/users', label: '用户管理', icon: Users, adminOnly: true },
+  { href: '/settings', label: '系统设置', icon: SettingsIcon, adminOnly: true },
   { href: '/docs', label: '开发手册', icon: BookOpen },
 ];
 
@@ -64,7 +66,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
-    const adminOnlyPaths = ['/levels', '/logs', '/users'];
+    const adminOnlyPaths = ['/levels', '/logs', '/users', '/settings'];
     if (user.role !== 'admin' && adminOnlyPaths.some((path) => pathname.startsWith(path))) {
       router.replace('/');
     }
